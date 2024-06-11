@@ -2,28 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreStockRequest;
-use App\Http\Requests\UpdateStockRequest;
-use App\Http\Resources\StockResource;
-use App\Http\Services\StockService;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 
 class StockController extends Controller
 {
-
-    protected StockService $service;
-
-    public function __construct(StockService $service)
-    {
-        $this->service = $service;
-    }
     /**
      * Display a listing of the resource.
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index()
     {
-        return StockResource::collection($this->service->getAll());
+        //
     }
 
     /**
@@ -37,18 +26,17 @@ class StockController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreStockRequest $request): StockResource
+    public function store(Request $request)
     {
-        $data = $request->validated();
-        return new StockResource($this->service->create($data));
+        //
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id): StockResource
+    public function show(Stock $stock)
     {
-        return new StockResource($this->service->getById($id));
+        //
     }
 
     /**
@@ -62,18 +50,16 @@ class StockController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateStockRequest $request, $id)
+    public function update(Request $request, Stock $stock)
     {
-        $data = $request->validated();
-        return new StockResource($this->service->update($id, $data));
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Stock $stock)
     {
-        $this->service->delete($id);
-        return response()->json(null, 204);
+        //
     }
 }

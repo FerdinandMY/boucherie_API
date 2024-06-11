@@ -12,45 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stocks', function (Blueprint $table) {
-            $table->id('id');
-            // Identifiant unique pour chaque enregistrement de stock
-
-            // Référence à l'identifiant de la boucherie
-
-            $table->unsignedBigInteger('butcher_id');
-
-            $table->foreign('butcher_id')->references('id')->on('butchers');
-
-            // Nom du produit en stock
-            $table->string('product_name', 100);
-
-            // Quantité du produit en stock
-            $table->integer('quantity');
-            //Quantité de viande en stock
-            $table->integer('quantity_meat');
-            //Quantité des tripes en stock
-            $table->integer('quantity_tripe');
-
-            // Unité de mesure pour le produit (par exemple, kg, pièces)
-            $table->string('unit', 20);
-
-            // Date d'ajout du produit en stock
-            $table->date('date_added');
-
-            // Date d'expiration du produit
-            $table->date('expiration_date')->nullable();
-
-            // Prix par unité du produit
-            $table->decimal('price_per_unit', 10, 2);
-
-            // Nom du fournisseur du produit
-            $table->string('supplier', 100)->nullable();
-
-            // Remarques ou commentaires additionnels sur le stock
-            $table->text('remarks')->nullable();
-
+            $table->id();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

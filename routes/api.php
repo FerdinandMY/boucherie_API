@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\ButcherController;
-use App\Http\Controllers\StockController;
-use App\Http\Controllers\TypestockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -30,9 +27,3 @@ Route::group(['prefix' => 'auth'], function () {
         Route::get('user', [AuthController::class, 'user']);
     });
 });
-
-Route::resource('butchers', ButcherController::class);
-
-Route::apiResource('stocks', StockController::class);
-
-Route::apiResource('type_stocks', TypeStockController::class);

@@ -12,17 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('typestocks', function (Blueprint $table) {
-            $table->id(); // Identifiant unique pour chaque type de stock
-
-            // Nom du type de stock
-            $table->string('type_name', 100);
-
-            // Description du type de stock
-            $table->text('description')->nullable();
-
+            $table->id();
             $table->timestamps();
-            $table->softDeletes();
-
         });
     }
 

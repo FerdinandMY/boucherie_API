@@ -2,27 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreTypeStockRequest;
-use App\Http\Requests\UpdateTypeStockRequest;
-use App\Http\Resources\TypeStockResource;
-use App\Http\Services\TypeStockService;
 use App\Models\Typestock;
 use Illuminate\Http\Request;
 
 class TypestockController extends Controller
 {
-    protected $service;
-
-    public function __construct(TypeStockService $service)
-    {
-        $this->service = $service;
-    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return TypeStockResource::collection($this->service->getAll());
+        //
     }
 
     /**
@@ -36,18 +26,17 @@ class TypestockController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTypeStockRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->validated();
-        return new TypeStockResource($this->service->create($data));
+        //
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Typestock $typestock)
     {
-        return new TypeStockResource($this->service->getById($id));
+        //
     }
 
     /**
@@ -61,18 +50,16 @@ class TypestockController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTypeStockRequest $request, $id)
+    public function update(Request $request, Typestock $typestock)
     {
-        $data = $request->validated();
-        return new TypeStockResource($this->service->update($id, $data));
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Typestock $typestock)
     {
-        $this->service->delete($id);
-        return response()->json(null, 204);
+        //
     }
 }

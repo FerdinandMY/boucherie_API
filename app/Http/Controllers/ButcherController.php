@@ -2,28 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateButcherRequest;
-use App\Http\Requests\UpdateButcherRequest;
 use App\Models\Butcher;
-use App\Repositories\ButcherShopRepository;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ButcherController extends Controller
 {
-    protected $repository;
-
-    public function __construct(ButcherShopRepository $repository)
-    {
-        $this->repository = $repository;
-    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $butcherShops = $this->repository->all();
-        return response()->json($butcherShops, 200);
+        //
     }
 
     /**
@@ -31,25 +20,23 @@ class ButcherController extends Controller
      */
     public function create()
     {
-
+        //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CreateButcherRequest $request): JsonResponse
+    public function store(Request $request)
     {
-        $data = $request->validated();
-        return response()->json($this->repository->create($data), 201);
+        //
     }
 
     /**
      * Display the specified resource.
      */
-    //public function show(Butcher $butcher)
-    public function show($id): JsonResponse
+    public function show(Butcher $butcher)
     {
-        return response()->json($this->repository->find($id));
+        //
     }
 
     /**
@@ -63,19 +50,16 @@ class ButcherController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateButcherRequest $request, $id): JsonResponse
+    public function update(Request $request, Butcher $butcher)
     {
-        $data = $request->validated();
-        return response()->json($this->repository->update($id, $data));
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    //public function destroy(Butcher $butcher)
-    public function destroy($id): JsonResponse
+    public function destroy(Butcher $butcher)
     {
-        $this->repository->delete($id);
-        return response()->json(null, 204);
+        //
     }
 }
