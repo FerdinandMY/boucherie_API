@@ -16,11 +16,11 @@ return new class extends Migration
 
             // Référence à l'identifiant de la boucherie
             $table->unsignedBigInteger('butcher_shop_id');
-            $table->foreign('butcher_shop_id')->references('id')->on('butcher_shops');
+            $table->foreign('butcher_id')->references('id')->on('butchers');
 
             // Référence à l'identifiant du produit
             $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('stock');
+            $table->foreign('product_id')->references('id')->on('stocks');
 
             // Quantité du produit vendu
             $table->integer('quantity');
