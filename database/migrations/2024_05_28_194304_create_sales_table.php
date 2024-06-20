@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id(); // Identifiant unique pour chaque vente
 
             // Référence à l'identifiant de la boucherie
-            $table->unsignedBigInteger('butcher_shop_id');
+            $table->unsignedBigInteger('butcher_id');
             $table->foreign('butcher_id')->references('id')->on('butchers');
 
             // Référence à l'identifiant du produit
