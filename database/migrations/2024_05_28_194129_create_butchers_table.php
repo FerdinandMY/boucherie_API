@@ -37,7 +37,7 @@ return new class extends Migration
             $table->string('opening_hours', 255)->nullable();
 
             // Date de création de la boucherie
-            $table->date('created_at')->nullable();
+//            $table->date('created_at')->nullable();
 
             // URL du site web de la boucherie
             $table->string('website', 100)->nullable();
