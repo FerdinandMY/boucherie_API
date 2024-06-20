@@ -12,15 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sales', function (Blueprint $table) {
-            $table->id(); // Identifiant unique pour chaque vente
+            $table->id('id');
+            // Identifiant unique pour chaque vente
 
             // Référence à l'identifiant de la boucherie
-            $table->unsignedBigInteger('butcher_shop_id');
+            $table->unsignedBigInteger('butcher_id');
             $table->foreign('butcher_id')->references('id')->on('butchers');
 
             // Référence à l'identifiant du produit
             $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('stocks');
+           // $table->foreign('product_id')->references('id')->on('stocks');
 
             // Quantité du produit vendu
             $table->integer('quantity');
