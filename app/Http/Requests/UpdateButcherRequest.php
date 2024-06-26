@@ -6,10 +6,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateButcherRequest extends FormRequest
 {
-    public function authorize()
+  /*  public function authorize()
     {
         return true;
-    }
+    }*/
 
     public function rules()
     {
@@ -21,11 +21,11 @@ class UpdateButcherRequest extends FormRequest
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:100',
             'opening_hours' => 'nullable|string|max:255',
-            'website' => 'nullable|string|max:100',
+            'website' => 'nullable|url|max:100',
             'owner' => 'nullable|string|max:100',
             'specialties' => 'nullable|string|max:255',
-            'average_rating' => 'nullable|numeric',
-            'review_count' => 'nullable|integer'
+            'average_rating' => 'nullable|numeric|min:0|max:5',
+            'review_count' => 'nullable|integer|min:0',
         ];
     }
 }
