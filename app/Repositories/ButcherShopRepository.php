@@ -9,7 +9,7 @@ class ButcherShopRepository
 {
     public function all()
     {
-        return Butcher::all();
+        return Butcher::paginate(10);
     }
 
     public function find($id)

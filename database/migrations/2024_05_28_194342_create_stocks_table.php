@@ -16,7 +16,9 @@ return new class extends Migration
             // Identifiant unique pour chaque enregistrement de stock
 
             // Référence à l'identifiant de la boucherie
+
             $table->unsignedBigInteger('butcher_id');
+
             $table->foreign('butcher_id')->references('id')->on('butchers');
 
             // Nom du produit en stock
@@ -24,6 +26,10 @@ return new class extends Migration
 
             // Quantité du produit en stock
             $table->integer('quantity');
+            //Quantité de viande en stock
+            $table->integer('quantity_meat');
+            //Quantité des tripes en stock
+            $table->integer('quantity_tripe');
 
             // Unité de mesure pour le produit (par exemple, kg, pièces)
             $table->string('unit', 20);
@@ -42,7 +48,9 @@ return new class extends Migration
 
             // Remarques ou commentaires additionnels sur le stock
             $table->text('remarks')->nullable();
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
