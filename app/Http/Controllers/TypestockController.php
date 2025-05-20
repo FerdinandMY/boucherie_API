@@ -3,63 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Typestock;
+use App\Repositories\Interfaces\TypeStockRepositoryInterface;
 use Illuminate\Http\Request;
 
 class TypestockController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $typeStockRepo;
+
+    public function __construct(TypeStockRepositoryInterface $typeStockRepo)
     {
-        //
+        $this->typeStockRepo = $typeStockRepo;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function index(): \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
+    {
+        $items = $this->typeStockRepo->all();
+        return view('type_stocks.index', compact('items'));
+    }
+
     public function create()
     {
-        //
+        return view('type_stocks.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string'
+        ]);
+
+        $this->typeStockRepo->create($data);
+        return redirect()->route('type_stocks.index')->with('success', 'Type créé avec succès.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Typestock $typestock)
+    public function show($id)
     {
-        //
+        $item = $this->typeStockRepo->find($id);
+        return view('type_stocks.show', compact('item'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Typestock $typestock)
+    public function edit($id)
     {
-        //
+        $item = $this->typeStockRepo->find($id);
+        return view('type_stocks.edit', compact('item'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Typestock $typestock)
+    public function update(Request $request, $id)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string'
+        ]);
+
+        $this->typeStockRepo->update($id, $data);
+        return redirect()->route('type_stocks.index')->with('success', 'Type mis à jour avec succès.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Typestock $typestock)
+    public function destroy($id)
     {
-        //
+        $this->typeStockRepo->delete($id);
+        return redirect()->route('type_stocks.index')->with('success', 'Type supprimé.');
     }
 }

@@ -5,15 +5,16 @@
 namespace App\Repositories;
 
 use App\Models\TypeStock;
+use App\Repositories\Interfaces\TypeStockRepositoryInterface;
 
-class TypeStockRepository
+class TypeStockRepository implements TypeStockRepositoryInterface
 {
-    public function getAll(): \Illuminate\Database\Eloquent\Collection
+    public function all(): \Illuminate\Database\Eloquent\Collection
     {
         return TypeStock::all();
     }
 
-    public function getById($id)
+    public function find($id)
     {
         return TypeStock::findOrFail($id);
     }
@@ -30,10 +31,10 @@ class TypeStockRepository
         return $typeStock;
     }
 
-    public function delete($id)
+    public function delete($id): bool
     {
         $typeStock = TypeStock::findOrFail($id);
         $typeStock->delete();
-        return $typeStock;
+        return true;
     }
 }
