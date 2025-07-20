@@ -5,6 +5,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ButcherController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\StockController;
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\CategoryController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -30,4 +33,19 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
     Route::get('user', [AuthController::class, 'user']);
     Route::apiResource('type-stocks', TypeStockController::class);
     Route::apiResource('butchers', ButcherController::class);
+    Route::apiResource('stocks', StockController::class);
+    Route::apiResource('products', ProductController::class)->names([
+        'index' => 'products.index',
+        'store' => 'products.store',
+        'show' => 'products.show',
+        'update' => 'products.update',
+        'destroy' => 'products.destroy',
+    ]);
+    Route::apiResource('categories', CategoryController::class)->names([
+        'index' => 'categories.index',
+        'store' => 'categories.store',
+        'show' => 'categories.show',
+        'update' => 'categories.update',
+        'destroy' => 'categories.destroy',
+    ]);
 });

@@ -30,10 +30,12 @@ return new class extends Migration
             $table->enum('movement_type', ['entrée', 'sortie', 'ajustement']);
 
             // Origine du mouvement : vente, achat, transformation, inventaire
-            $table->string('source_type')->nullable();
+            //$table->string('source_type')->nullable();
 
             // ID de l'entité source si applicable (ex: sale_id, purchase_id)
-            $table->unsignedBigInteger('source_id')->nullable();
+            //$table->unsignedBigInteger('source_id')->nullable();
+
+            $table->morphs('source');
 
             $table->timestamps();
         });

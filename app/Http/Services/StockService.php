@@ -2,40 +2,33 @@
 
 namespace App\Http\Services;
 
-
-use App\Repositories\StockRepository;
+use App\Models\Stock;
 
 class StockService
 {
-    protected $repository;
-
-    public function __construct(StockRepository $repository)
+    public function list(): \Illuminate\Database\Eloquent\Collection
     {
-        $this->repository = $repository;
+        return Stock::all();
     }
 
-    public function getAll()
+    public function find(int $id): Stock
     {
-        return $this->repository->getAll();
+        return Stock::findOrFail($id);
     }
 
-    public function getById($id)
+    public function create(array $data): Stock
     {
-        return $this->repository->getById($id);
+        return Stock::create($data);
     }
 
-    public function create(array $data)
+    public function update(Stock $stock, array $data): Stock
     {
-        return $this->repository->create($data);
+        $stock->update($data);
+        return $stock;
     }
 
-    public function update($id, array $data)
+    public function delete(Stock $stock): void
     {
-        return $this->repository->update($id, $data);
-    }
-
-    public function delete($id)
-    {
-        return $this->repository->delete($id);
+        $stock->delete();
     }
 }
