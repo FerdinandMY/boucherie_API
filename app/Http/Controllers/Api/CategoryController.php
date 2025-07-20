@@ -24,7 +24,6 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request): CategoryResource
     {
         $category = $this->service->create($request->validated());
-        dd("ici");
         return new CategoryResource($category);
     }
 
