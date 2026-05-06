@@ -32,7 +32,15 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+# Provide a minimal env so Composer's post-install scripts can bootstrap Laravel
+RUN cp .env.example .env
+
+# Skip post-autoload scripts (they need a real DB/key); optimise autoloader only
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --no-progress
+
+# Remove the placeholder env — the real one is injected at runtime by Render
+RUN rm .env
 
 RUN mkdir -p storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \

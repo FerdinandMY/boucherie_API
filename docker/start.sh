@@ -3,6 +3,9 @@ set -e
 
 cd /var/www/html
 
+echo "[deploy] Discovering packages..."
+php artisan package:discover --ansi
+
 echo "[deploy] Clearing old cache..."
 php artisan optimize:clear
 
