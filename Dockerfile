@@ -32,15 +32,14 @@ WORKDIR /var/www/html
 
 COPY . .
 
-# Provide a minimal env so Composer's post-install scripts can bootstrap Laravel
-RUN cp .env.example .env
-
-# Skip post-autoload scripts (they need a real DB/key); optimise autoloader only
+# Skip post-autoload scripts (they need a real DB/key at runtime)
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --no-progress
 
-# Remove the placeholder env — the real one is injected at runtime by Render
-RUN rm .env
+# Regenerate composer.lock for PHP 8.2 (the lock may have been generated on PHP 8.4 locally)
+RUN composer update --lock --no-scripts --no-interaction --no-progress --quiet
+
+# Install production dependencies
+RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --no-progress
 
 RUN mkdir -p storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
