@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'type'  => 'laravel',
+    'type'  => 'static',
     'theme' => 'default',
 
     'title'       => 'Boucherie API — Documentation',
