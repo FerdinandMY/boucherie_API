@@ -30,8 +30,11 @@ class AnimalController extends Controller
 
     public function show(string $id): JsonResponse
     {
+        $animal = $this->service->findById($id);
+        $this->authorize('view', $animal);
+
         return response()->json([
-            'data' => new AnimalResource($this->service->findById($id)),
+            'data' => new AnimalResource($animal),
         ]);
     }
 }

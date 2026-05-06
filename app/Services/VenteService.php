@@ -45,15 +45,26 @@ class VenteService
             $vente        = $this->repository->create($data);
             $montantTotal = 0;
 
-            foreach ($lignes as $ligneData) {
-                $produit   = \App\Models\Produit::findOrFail($ligneData['produit_id']);
-                $prix      = $ligneData['prix_unitaire'] ?? (float) $produit->prix_unitaire;
-                $quantite  = (float) $ligneData['quantite'];
-                $sousTotal = round($prix * $quantite, 2);
+            $produitIds = array_column($lignes, 'produit_id');
+            $produits   = \App\Models\Produit::whereIn('id', $produitIds)->get()->keyBy('id');
+            $stocks     = Stock::where('boucherie_id', $vente->boucherie_id)
+                ->whereIn('produit_id', $produitIds)
+                ->get()
+                ->keyBy('produit_id');
 
-                $stock = Stock::where('boucherie_id', $vente->boucherie_id)
-                    ->where('produit_id', $ligneData['produit_id'])
-                    ->first();
+            foreach ($lignes as $ligneData) {
+                $produit  = $produits[$ligneData['produit_id']] ?? null;
+                $prix     = $ligneData['prix_unitaire'] ?? ($produit ? (float) $produit->prix_unitaire : 0);
+                $quantite = (float) $ligneData['quantite'];
+                $stock    = $stocks[$ligneData['produit_id']] ?? null;
+
+                if (!$produit) {
+                    throw ValidationException::withMessages([
+                        'lignes' => ["Produit introuvable : {$ligneData['produit_id']}."],
+                    ]);
+                }
+
+                $sousTotal = round($prix * $quantite, 2);
 
                 if (!$stock || (float) $stock->quantite < $quantite) {
                     throw ValidationException::withMessages([

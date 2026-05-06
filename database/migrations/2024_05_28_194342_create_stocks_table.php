@@ -12,45 +12,32 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stocks', function (Blueprint $table) {
-            $table->id('id');
-            // Identifiant unique pour chaque enregistrement de stock
+            $table->id();
 
-            // Référence à l'identifiant de la boucherie
+            // Référence au produit (viande, abats, etc.)
+            $table->integer('product_id');
 
-            $table->unsignedBigInteger('butcher_id');
+            // Référence au type de stock (frigo, congélateur...)
+            $table->integer('type_stock_id');
 
-            $table->foreign('butcher_id')->references('id')->on('butchers');
+            // Quantité disponible
+            $table->decimal('quantity', 10, 2); // ex: 25.50 kg
 
-            // Nom du produit en stock
-            $table->string('product_name', 100);
+            // Unité : kg, pièce, etc.
+            $table->string('unit', 20)->default('kg');
 
-            // Quantité du produit en stock
-            $table->integer('quantity');
-            //Quantité de viande en stock
-            $table->integer('quantity_meat');
-            //Quantité des tripes en stock
-            $table->integer('quantity_tripe');
+            // Type de mouvement : entrée, sortie, ajustement
+            $table->enum('movement_type', ['entrée', 'sortie', 'ajustement']);
 
-            // Unité de mesure pour le produit (par exemple, kg, pièces)
-            $table->string('unit', 20);
+            // Origine du mouvement : vente, achat, transformation, inventaire
+            //$table->string('source_type')->nullable();
 
-            // Date d'ajout du produit en stock
-            $table->date('date_added');
+            // ID de l'entité source si applicable (ex: sale_id, purchase_id)
+            //$table->unsignedBigInteger('source_id')->nullable();
 
-            // Date d'expiration du produit
-            $table->date('expiration_date')->nullable();
-
-            // Prix par unité du produit
-            $table->decimal('price_per_unit', 10, 2);
-
-            // Nom du fournisseur du produit
-            $table->string('supplier', 100)->nullable();
-
-            // Remarques ou commentaires additionnels sur le stock
-            $table->text('remarks')->nullable();
+            $table->morphs('source');
 
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

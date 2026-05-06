@@ -45,8 +45,11 @@ class AchatFournisseurController extends Controller
 
     public function show(string $id): JsonResponse
     {
+        $achat = $this->service->findById($id);
+        $this->authorize('view', $achat);
+
         return response()->json([
-            'data' => new AchatFournisseurResource($this->service->findById($id)),
+            'data' => new AchatFournisseurResource($achat),
         ]);
     }
 }

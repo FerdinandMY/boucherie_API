@@ -1,24 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use App\Models\Abattage;
+use App\Models\AchatFournisseur;
+use App\Models\Animal;
+use App\Models\Client;
+use App\Models\Fournisseur;
+use App\Models\Produit;
+use App\Models\Stock;
+use App\Models\Vente;
+use App\Policies\AbattagePolicy;
+use App\Policies\AchatFournisseurPolicy;
+use App\Policies\AnimalPolicy;
+use App\Policies\ClientPolicy;
+use App\Policies\FournisseurPolicy;
+use App\Policies\ProduitPolicy;
+use App\Policies\StockPolicy;
+use App\Policies\VentePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    /**
-     * The model to policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
-     */
     protected $policies = [
-        //
+        Vente::class           => VentePolicy::class,
+        Fournisseur::class     => FournisseurPolicy::class,
+        Client::class          => ClientPolicy::class,
+        Produit::class         => ProduitPolicy::class,
+        AchatFournisseur::class => AchatFournisseurPolicy::class,
+        Animal::class          => AnimalPolicy::class,
+        Abattage::class        => AbattagePolicy::class,
+        Stock::class           => StockPolicy::class,
     ];
 
-    /**
-     * Register any authentication / authorization services.
-     */
     public function boot(): void
     {
         //

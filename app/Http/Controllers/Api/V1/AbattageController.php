@@ -43,8 +43,11 @@ class AbattageController extends Controller
 
     public function show(string $id): JsonResponse
     {
+        $abattage = $this->service->findById($id);
+        $this->authorize('view', $abattage);
+
         return response()->json([
-            'data' => new AbattageResource($this->service->findById($id)),
+            'data' => new AbattageResource($abattage),
         ]);
     }
 }

@@ -48,13 +48,19 @@ class VenteController extends Controller
 
     public function show(string $id): JsonResponse
     {
+        $vente = $this->service->findById($id);
+        $this->authorize('view', $vente);
+
         return response()->json([
-            'data' => new VenteResource($this->service->findById($id)),
+            'data' => new VenteResource($vente),
         ]);
     }
 
     public function updateStatut(UpdateVenteStatutRequest $request, string $id): JsonResponse
     {
+        $vente = $this->service->findById($id);
+        $this->authorize('update', $vente);
+
         $vente = $this->service->updateStatut($id, $request->validated(), $request->user()->id);
 
         return response()->json([
@@ -65,6 +71,9 @@ class VenteController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
+        $vente = $this->service->findById($id);
+        $this->authorize('delete', $vente);
+
         $this->service->delete($id);
 
         return response()->json(null, 204);

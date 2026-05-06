@@ -44,13 +44,19 @@ class ClientController extends Controller
 
     public function show(string $id): JsonResponse
     {
+        $client = $this->service->findById($id);
+        $this->authorize('view', $client);
+
         return response()->json([
-            'data' => new ClientResource($this->service->findById($id)),
+            'data' => new ClientResource($client),
         ]);
     }
 
     public function update(UpdateClientRequest $request, string $id): JsonResponse
     {
+        $client = $this->service->findById($id);
+        $this->authorize('update', $client);
+
         $client = $this->service->update($id, $request->validated());
 
         return response()->json([
@@ -61,6 +67,9 @@ class ClientController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
+        $client = $this->service->findById($id);
+        $this->authorize('delete', $client);
+
         $this->service->delete($id);
 
         return response()->json(null, 204);

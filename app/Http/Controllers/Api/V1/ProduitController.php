@@ -44,13 +44,19 @@ class ProduitController extends Controller
 
     public function show(string $id): JsonResponse
     {
+        $produit = $this->service->findById($id);
+        $this->authorize('view', $produit);
+
         return response()->json([
-            'data' => new ProduitResource($this->service->findById($id)),
+            'data' => new ProduitResource($produit),
         ]);
     }
 
     public function update(UpdateProduitRequest $request, string $id): JsonResponse
     {
+        $produit = $this->service->findById($id);
+        $this->authorize('update', $produit);
+
         $produit = $this->service->update($id, $request->validated());
 
         return response()->json([
@@ -61,6 +67,9 @@ class ProduitController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
+        $produit = $this->service->findById($id);
+        $this->authorize('delete', $produit);
+
         $this->service->delete($id);
 
         return response()->json(null, 204);

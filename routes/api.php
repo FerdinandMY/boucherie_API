@@ -35,10 +35,10 @@ Route::prefix('v1')->group(function () {
 
         // ── Référentiels (Enums) — tous les rôles authentifiés ──────────────
         Route::prefix('referentiels/{type}')->group(function () {
-            Route::get('/',         [EnumValeurController::class, 'index']);
-            Route::post('/',        [EnumValeurController::class, 'store']);
-            Route::patch('/{id}',   [EnumValeurController::class, 'update']);
-            Route::delete('/{id}',  [EnumValeurController::class, 'destroy']);
+            Route::get('/',        [EnumValeurController::class, 'index']);
+            Route::post('/',       [EnumValeurController::class, 'store']);
+            Route::patch('/{id}',  [EnumValeurController::class, 'update']);
+            Route::delete('/{id}', [EnumValeurController::class, 'destroy']);
         });
 
         // ── Admin uniquement ─────────────────────────────────────────────────
@@ -53,30 +53,30 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('clients', ClientController::class);
             Route::apiResource('produits', ProduitController::class);
 
-            Route::get('achats-fournisseurs',             [AchatFournisseurController::class, 'index']);
-            Route::post('achats-fournisseurs',            [AchatFournisseurController::class, 'store']);
-            Route::get('achats-fournisseurs/{achat}',     [AchatFournisseurController::class, 'show']);
+            Route::get('achats-fournisseurs',           [AchatFournisseurController::class, 'index']);
+            Route::post('achats-fournisseurs',          [AchatFournisseurController::class, 'store']);
+            Route::get('achats-fournisseurs/{achat}',   [AchatFournisseurController::class, 'show']);
 
-            Route::get('animaux',           [AnimalController::class, 'index']);
-            Route::get('animaux/{animal}',  [AnimalController::class, 'show']);
+            Route::get('animaux',          [AnimalController::class, 'index']);
+            Route::get('animaux/{animal}', [AnimalController::class, 'show']);
 
-            Route::get('abattages',              [AbattageController::class, 'index']);
-            Route::post('abattages',             [AbattageController::class, 'store']);
-            Route::get('abattages/{abattage}',   [AbattageController::class, 'show']);
+            Route::get('abattages',            [AbattageController::class, 'index']);
+            Route::post('abattages',           [AbattageController::class, 'store']);
+            Route::get('abattages/{abattage}', [AbattageController::class, 'show']);
 
-            Route::get('stocks',                        [StockController::class, 'index']);
-            Route::get('stocks/{stock}',                [StockController::class, 'show']);
-            Route::get('stocks/{stock}/mouvements',     [StockController::class, 'mouvements']);
-            Route::post('stocks/{stock}/ajuster',       [StockController::class, 'ajuster']);
+            Route::get('stocks',                    [StockController::class, 'index']);
+            Route::get('stocks/{stock}',            [StockController::class, 'show']);
+            Route::get('stocks/{stock}/mouvements', [StockController::class, 'mouvements']);
+            Route::post('stocks/{stock}/ajuster',   [StockController::class, 'ajuster']);
         });
 
         // ── Admin + Boucher + Caissier ───────────────────────────────────────
         Route::middleware('role:admin|boucher|caissier')->group(function () {
-            Route::get('ventes',                    [VenteController::class, 'index']);
-            Route::post('ventes',                   [VenteController::class, 'store']);
-            Route::get('ventes/{vente}',            [VenteController::class, 'show']);
-            Route::patch('ventes/{vente}/statut',   [VenteController::class, 'updateStatut']);
-            Route::delete('ventes/{vente}',         [VenteController::class, 'destroy']);
+            Route::get('ventes',                  [VenteController::class, 'index']);
+            Route::post('ventes',                 [VenteController::class, 'store']);
+            Route::get('ventes/{vente}',          [VenteController::class, 'show']);
+            Route::patch('ventes/{vente}/statut', [VenteController::class, 'updateStatut']);
+            Route::delete('ventes/{vente}',       [VenteController::class, 'destroy']);
 
             Route::get('ventes/{vente}/paiements',  [PaiementController::class, 'index']);
             Route::post('ventes/{vente}/paiements', [PaiementController::class, 'store']);

@@ -44,13 +44,19 @@ class FournisseurController extends Controller
 
     public function show(string $id): JsonResponse
     {
+        $fournisseur = $this->service->findById($id);
+        $this->authorize('view', $fournisseur);
+
         return response()->json([
-            'data' => new FournisseurResource($this->service->findById($id)),
+            'data' => new FournisseurResource($fournisseur),
         ]);
     }
 
     public function update(UpdateFournisseurRequest $request, string $id): JsonResponse
     {
+        $fournisseur = $this->service->findById($id);
+        $this->authorize('update', $fournisseur);
+
         $fournisseur = $this->service->update($id, $request->validated());
 
         return response()->json([
@@ -61,6 +67,9 @@ class FournisseurController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
+        $fournisseur = $this->service->findById($id);
+        $this->authorize('delete', $fournisseur);
+
         $this->service->delete($id);
 
         return response()->json(null, 204);

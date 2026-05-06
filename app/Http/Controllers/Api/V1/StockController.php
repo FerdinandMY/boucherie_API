@@ -31,18 +31,27 @@ class StockController extends Controller
 
     public function show(string $id): JsonResponse
     {
+        $stock = $this->service->getById($id);
+        $this->authorize('view', $stock);
+
         return response()->json([
-            'data' => new StockResource($this->service->getById($id)),
+            'data' => new StockResource($stock),
         ]);
     }
 
     public function mouvements(string $id): AnonymousResourceCollection
     {
+        $stock = $this->service->getById($id);
+        $this->authorize('view', $stock);
+
         return MouvementStockResource::collection($this->service->mouvements($id));
     }
 
     public function ajuster(AjusterStockRequest $request, string $id): JsonResponse
     {
+        $stock = $this->service->getById($id);
+        $this->authorize('update', $stock);
+
         $stock = $this->service->ajuster($id, $request->validated(), $request->user()->id);
 
         return response()->json([
