@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
-<<<<<<< HEAD
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
-=======
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
->>>>>>> 9d2db2735a7d527683fc4f186b022af6f39b7383
 
 class Handler extends ExceptionHandler
 {

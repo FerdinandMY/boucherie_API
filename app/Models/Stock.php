@@ -7,7 +7,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-<<<<<<< HEAD
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -45,22 +44,5 @@ class Stock extends Model
     public function isEnAlerte(): bool
     {
         return (float) $this->quantite <= (float) $this->seuil_alerte;
-=======
-
-class Stock extends Model
-{
-    use HasFactory;
-
-    protected $guarded = [];
-
-    public function source()
-    {
-        return $this->morphTo(__FUNCTION__, 'source_type', 'source_id');
-    }
-
-    public function stocks()
-    {
-        return $this->morphMany(Stock::class, 'source');
->>>>>>> 9d2db2735a7d527683fc4f186b022af6f39b7383
     }
 }
