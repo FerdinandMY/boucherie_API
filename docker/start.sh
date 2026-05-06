@@ -1,8 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
-echo "[deploy] Installing dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction --working-dir=/var/www/html
+cd /var/www/html
 
 echo "[deploy] Clearing old cache..."
 php artisan optimize:clear
@@ -18,3 +17,6 @@ php artisan migrate --force
 echo "[deploy] Seeding reference data..."
 php artisan db:seed --class=RoleSeeder --force
 php artisan db:seed --class=EnumValeurSeeder --force
+
+echo "[deploy] Starting nginx + php-fpm..."
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
