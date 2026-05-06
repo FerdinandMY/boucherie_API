@@ -35,11 +35,12 @@ COPY . .
 # Skip post-autoload scripts (they need a real DB/key at runtime)
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Regenerate composer.lock for PHP 8.2 (the lock may have been generated on PHP 8.4 locally)
-RUN composer update --lock --no-scripts --no-interaction --no-progress --quiet
-
-# Install production dependencies
-RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --no-progress
+# Install production dependencies.
+# --ignore-platform-req=php : the lock was generated on PHP 8.4 (dev machine) but the
+# Docker runtime is PHP 8.2. All *production* packages support 8.2; only dev packages
+# (Scribe) require 8.4, and they are excluded by --no-dev.
+RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --no-progress \
+    --ignore-platform-req=php
 
 RUN mkdir -p storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
