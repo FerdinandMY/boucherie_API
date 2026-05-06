@@ -67,7 +67,7 @@ INTRO,
 
     'try_it_out' => [
         'enabled'  => true,
-        'base_url' => null,
+        'base_url' => env('APP_URL'),
         'use_csrf' => false,
     ],
 

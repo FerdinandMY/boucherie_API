@@ -18,12 +18,16 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # Installer toutes les dépendances (dont Scribe en dev)
 RUN composer install --no-scripts --no-interaction --no-progress
 
+# URL de l'API en production (utilisée par Scribe pour le "Try it out")
+ARG APP_URL=https://boucherie-api.onrender.com
+
 # Environnement minimal pour booter Laravel sans DB réelle
-RUN printf 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n\
+RUN printf "APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n\
 APP_ENV=local\n\
+APP_URL=${APP_URL}\n\
 DB_CONNECTION=sqlite\n\
 DB_DATABASE=:memory:\n\
-LOG_CHANNEL=stderr\n' > .env
+LOG_CHANNEL=stderr\n" > .env
 
 # Découverte des packages puis génération de la doc statique
 RUN php artisan package:discover --ansi \
