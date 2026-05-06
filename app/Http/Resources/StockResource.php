@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
@@ -7,21 +9,19 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class StockResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray($request): array
+    public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id ?? null,
-            'product_name' => $this->product_name ?? null,
-            'type' => $this->type ?? null,
-            'quantity' => $this->quantity ?? null,
-            'unit' => $this->unit ?? null,
-            'price_per_unit' => $this->price_per_unit ?? null,
-            'butchers' => ButcherShopResource::collection($this->whenLoaded('butchers')),
+            'id'            => $this->id,
+            'boucherie_id'  => $this->boucherie_id,
+            'produit_id'    => $this->produit_id,
+            'produit'       => $this->whenLoaded('produit', fn () => new ProduitResource($this->produit)),
+            'abattage_id'   => $this->abattage_id,
+            'quantite'      => $this->quantite,
+            'seuil_alerte'  => $this->seuil_alerte,
+            'en_alerte'     => $this->isEnAlerte(),
+            'created_at'    => $this->created_at?->toISOString(),
+            'updated_at'    => $this->updated_at?->toISOString(),
         ];
     }
 }

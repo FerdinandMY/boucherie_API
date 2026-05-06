@@ -1,39 +1,46 @@
 <?php
 
-// app/Repositories/TypeStockRepository.php
+declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Models\TypeStock;
+use App\Models\Typestock;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class TypeStockRepository
 {
-    public function getAll(): \Illuminate\Database\Eloquent\Collection
+    public function __construct(
+        private readonly Typestock $model
+    ) {}
+
+    public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return TypeStock::all();
+        return $this->model->query()
+            ->select(['id', 'type_name', 'description', 'created_at', 'updated_at'])
+            ->latest()
+            ->paginate($perPage);
     }
 
-    public function getById($id)
+    public function getById(int $id): Typestock
     {
-        return TypeStock::findOrFail($id);
+        return $this->model->query()->findOrFail($id);
     }
 
-    public function create(array $data)
+    public function create(array $data): Typestock
     {
-        return TypeStock::create($data);
+        return $this->model->query()->create($data);
     }
 
-    public function update($id, array $data)
+    public function update(int $id, array $data): Typestock
     {
-        $typeStock = TypeStock::findOrFail($id);
+        $typeStock = $this->model->query()->findOrFail($id);
         $typeStock->update($data);
+
         return $typeStock;
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
-        $typeStock = TypeStock::findOrFail($id);
-        $typeStock->delete();
-        return $typeStock;
+        $this->model->query()->findOrFail($id)->delete();
     }
 }

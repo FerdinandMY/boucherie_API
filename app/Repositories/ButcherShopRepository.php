@@ -1,38 +1,48 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Models\Butcher;
-
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ButcherShopRepository
 {
-    public function all()
+    public function __construct(
+        private readonly Butcher $model
+    ) {}
+
+    public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Butcher::paginate(10);
+        return $this->model->query()
+            ->select(['id', 'name', 'address', 'city', 'postal_code', 'phone', 'email',
+                      'opening_hours', 'website', 'owner', 'specialties',
+                      'average_rating', 'review_count', 'created_at', 'updated_at'])
+            ->latest()
+            ->paginate($perPage);
     }
 
-    public function find($id)
+    public function findOrFail(int $id): Butcher
     {
-        return Butcher::findOrFail($id);
+        return $this->model->query()->findOrFail($id);
     }
 
-    public function create(array $data)
+    public function create(array $data): Butcher
     {
-        return Butcher::create($data);
+        return $this->model->query()->create($data);
     }
 
-    public function update($id, array $data)
+    public function update(int $id, array $data): Butcher
     {
-        $butcherShop = $this->find($id);
-        $butcherShop->update($data);
-        return $butcherShop;
+        $butcher = $this->findOrFail($id);
+        $butcher->update($data);
+
+        return $butcher;
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
-        $butcherShop = $this->find($id);
-        $butcherShop->delete();
-        return $butcherShop;
+        $this->findOrFail($id)->delete();
     }
 }

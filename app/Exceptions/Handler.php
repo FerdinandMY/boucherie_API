@@ -1,51 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exceptions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    /**
-     * The list of the inputs that are never flashed to the session on validation exceptions.
-     *
-     * @var array<int, string>
-     */
     protected $dontFlash = [
         'current_password',
         'password',
         'password_confirmation',
     ];
 
-    /**
-     * Register the exception handling callbacks for the application.
-     */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Ressource introuvable.'], 404);
         });
-    }
 
-    public function render($request, Exception|Throwable $exception)
-    {
-        if ($exception instanceof ModelNotFoundException) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Resource not found'
-            ], 404);
-        }
+        $this->renderable(function (AuthorizationException $e) {
+            return response()->json(['message' => 'Action non autorisée.'], 403);
+        });
 
-        if ($exception instanceof ValidationException) {
+        $this->renderable(function (AuthenticationException $e) {
+            return response()->json(['message' => 'Non authentifié.'], 401);
+        });
+
+        $this->renderable(function (ValidationException $e) {
             return response()->json([
-                'status' => 'error',
-                'message' => $exception->validator->errors()->first()
+                'message' => 'Les données fournies sont invalides.',
+                'errors'  => $e->errors(),
             ], 422);
-        }
-
-        return parent::render($request, $exception);
+        });
     }
 }

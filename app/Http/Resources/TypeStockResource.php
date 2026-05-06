@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
@@ -7,19 +9,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TypeStockResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray($request): array
+    public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id ?? null,
-            'type_name' => $this->type_name ?? null,
-            'description' => $this->description ?? null,
-            'created_at' => $this->created_at ?? null,
-            'updated_at' => $this->updated_at ?? null,
+            'id'          => $this->id,
+            'type_name'   => $this->type_name,
+            'description' => $this->description,
+            'created_at'  => $this->created_at?->toISOString(),
+            'updated_at'  => $this->updated_at?->toISOString(),
         ];
     }
 }
