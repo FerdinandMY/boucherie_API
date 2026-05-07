@@ -44,31 +44,40 @@ class AbattageService
                 );
             }
 
-            $data['user_id']      = $userId;
-            $data['boucherie_id'] = $animal->boucherie_id;
+            $data['user_id'] = $userId;
+
+            // Flux fournisseur : boucherie_id reste null, le stock sera alimenté à la réception
+            // Flux boucherie   : boucherie_id provient de l'animal
+            $isFournisseurFlow = $animal->isOwnedByFournisseur();
+            if (! $isFournisseurFlow) {
+                $data['boucherie_id'] = $animal->boucherie_id;
+            }
 
             $abattage = $this->repository->create($data);
 
             $animal->update(['statut' => 'abattu']);
 
-            foreach ($data['stocks'] ?? [] as $stockData) {
-                $stock = Stock::firstOrCreate(
-                    ['boucherie_id' => $abattage->boucherie_id, 'produit_id' => $stockData['produit_id']],
-                    ['quantite' => 0, 'seuil_alerte' => $stockData['seuil_alerte'] ?? 0, 'abattage_id' => $abattage->id]
-                );
+            // Alimentation directe du stock uniquement dans le flux boucherie
+            if (! $isFournisseurFlow) {
+                foreach ($data['stocks'] ?? [] as $stockData) {
+                    $stock = Stock::firstOrCreate(
+                        ['boucherie_id' => $abattage->boucherie_id, 'produit_id' => $stockData['produit_id']],
+                        ['quantite' => 0, 'seuil_alerte' => $stockData['seuil_alerte'] ?? 0, 'abattage_id' => $abattage->id]
+                    );
 
-                $stock->increment('quantite', (float) $stockData['quantite']);
+                    $stock->increment('quantite', (float) $stockData['quantite']);
 
-                MouvementStock::create([
-                    'stock_id' => $stock->id,
-                    'user_id'  => $userId,
-                    'type'     => 'entree',
-                    'quantite' => $stockData['quantite'],
-                    'motif'    => "Abattage #{$abattage->id}",
-                ]);
+                    MouvementStock::create([
+                        'stock_id' => $stock->id,
+                        'user_id'  => $userId,
+                        'type'     => 'entree',
+                        'quantite' => $stockData['quantite'],
+                        'motif'    => "Abattage #{$abattage->id}",
+                    ]);
+                }
             }
 
-            return $abattage->fresh(['animal', 'stocks.produit']);
+            return $abattage->fresh(['animal', 'stocks.produit', 'distributions']);
         });
     }
 }

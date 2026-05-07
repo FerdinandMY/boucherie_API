@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Boucherie;
+use App\Models\Fournisseur;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -22,38 +23,38 @@ class UserSeeder extends Seeder
             ]
         );
 
-        $users = [
-            [
-                'name'     => 'Admin Test',
-                'email'    => 'admin@test.com',
-                'password' => 'password',
-                'role'     => 'admin',
-            ],
-            [
-                'name'     => 'Boucher Test',
-                'email'    => 'boucher@test.com',
-                'password' => 'password',
-                'role'     => 'boucher',
-            ],
-            [
-                'name'     => 'Caissier Test',
-                'email'    => 'caissier@test.com',
-                'password' => 'password',
-                'role'     => 'caissier',
-            ],
-        ];
+        // Admin
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@test.com'],
+            ['name' => 'Admin Test', 'password' => 'password', 'boucherie_id' => $boucherie->id]
+        );
+        $admin->syncRoles(['admin']);
 
-        foreach ($users as $data) {
-            $user = User::firstOrCreate(
-                ['email' => $data['email']],
-                [
-                    'name'         => $data['name'],
-                    'password'     => $data['password'],
-                    'boucherie_id' => $boucherie->id,
-                ]
-            );
+        // Boucher
+        $boucher = User::firstOrCreate(
+            ['email' => 'boucher@test.com'],
+            ['name' => 'Boucher Test', 'password' => 'password', 'boucherie_id' => $boucherie->id]
+        );
+        $boucher->syncRoles(['boucher']);
 
-            $user->syncRoles([$data['role']]);
-        }
+        // Fournisseur — créer l'utilisateur puis l'entité Fournisseur liée
+        $fournisseurUser = User::firstOrCreate(
+            ['email' => 'fournisseur@test.com'],
+            ['name' => 'Fournisseur Test', 'password' => 'password', 'boucherie_id' => null]
+        );
+        $fournisseurUser->syncRoles(['fournisseur']);
+
+        // Entité Fournisseur liée au compte utilisateur
+        Fournisseur::firstOrCreate(
+            ['user_id' => $fournisseurUser->id],
+            [
+                'boucherie_id' => $boucherie->id,
+                'nom'          => 'Élevage Test',
+                'contact'      => 'Fournisseur Test',
+                'telephone'    => '+22600000001',
+                'email'        => 'fournisseur@test.com',
+                'adresse'      => 'Zone d\'élevage, Ouagadougou',
+            ]
+        );
     }
 }

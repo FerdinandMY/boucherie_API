@@ -22,6 +22,11 @@ class Animal extends Model
         'date_acquisition', 'statut',
     ];
 
+    public function isOwnedByFournisseur(): bool
+    {
+        return $this->fournisseur_id !== null && $this->boucherie_id === null;
+    }
+
     protected $casts = [
         'poids_vif_kg'     => 'decimal:2',
         'prix_achat'       => 'decimal:2',

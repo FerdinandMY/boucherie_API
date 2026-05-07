@@ -19,6 +19,11 @@ class Abattage extends Model
         'date_abattage', 'poids_carcasse_kg', 'rendement_pct', 'notes',
     ];
 
+    public function distributions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Distribution::class, 'abattage_id');
+    }
+
     protected $casts = [
         'date_abattage'   => 'date',
         'poids_carcasse_kg' => 'decimal:2',

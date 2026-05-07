@@ -13,7 +13,12 @@ class Fournisseur extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['boucherie_id', 'nom', 'contact', 'telephone', 'email', 'adresse'];
+    protected $fillable = ['user_id', 'boucherie_id', 'nom', 'contact', 'telephone', 'email', 'adresse'];
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     public function animaux(): HasMany
     {

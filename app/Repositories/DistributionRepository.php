@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Repositories;
+
+use App\Models\Distribution;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+class DistributionRepository
+{
+    public function __construct(private readonly Distribution $model) {}
+
+    public function paginateByFournisseur(int $fournisseurUserId, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->query()
+            ->where('fournisseur_user_id', $fournisseurUserId)
+            ->with(['abattage', 'boucherie', 'produit', 'reception'])
+            ->latest()
+            ->paginate($perPage);
+    }
+
+    public function paginateByBoucherie(string $boucherieId, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->query()
+            ->where('boucherie_id', $boucherieId)
+            ->with(['abattage', 'fournisseurUser', 'produit', 'reception'])
+            ->latest()
+            ->paginate($perPage);
+    }
+
+    public function findOrFail(string $id): Distribution
+    {
+        return $this->model->query()
+            ->with(['abattage.animal', 'boucherie', 'produit', 'fournisseurUser', 'reception'])
+            ->findOrFail($id);
+    }
+
+    public function create(array $data): Distribution
+    {
+        return $this->model->query()->create($data);
+    }
+
+    public function update(string $id, array $data): Distribution
+    {
+        $distribution = $this->findOrFail($id);
+        $distribution->update($data);
+        return $distribution->fresh(['abattage', 'boucherie', 'produit', 'reception']);
+    }
+}

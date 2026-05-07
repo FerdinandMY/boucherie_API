@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreReceptionRequest extends FormRequest
+{
+    public function authorize(): bool { return true; }
+
+    public function rules(): array
+    {
+        return [
+            'distribution_id' => ['required', 'uuid', 'exists:distributions,id'],
+            'quantite_recue'  => ['required', 'numeric', 'min:0.001'],
+            'date_reception'  => ['required', 'date'],
+            'notes'           => ['nullable', 'string', 'max:1000'],
+        ];
+    }
+}

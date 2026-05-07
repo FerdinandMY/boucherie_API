@@ -8,14 +8,17 @@ use App\Http\Controllers\Api\V1\AnimalController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BoucherieController;
 use App\Http\Controllers\Api\V1\ClientController;
+use App\Http\Controllers\Api\V1\DistributionController;
 use App\Http\Controllers\Api\V1\EnumValeurController;
 use App\Http\Controllers\Api\V1\FournisseurController;
 use App\Http\Controllers\Api\V1\LivraisonController;
 use App\Http\Controllers\Api\V1\PaiementController;
 use App\Http\Controllers\Api\V1\ProduitController;
+use App\Http\Controllers\Api\V1\ReceptionController;
 use App\Http\Controllers\Api\V1\StockController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\VenteController;
+use App\Http\Controllers\Api\V1\VersementController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -41,14 +44,15 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [EnumValeurController::class, 'destroy']);
         });
 
-        // ── Admin uniquement ─────────────────────────────────────────────────
+        // ── Admin uniquement — gestion des utilisateurs ──────────────────────
         Route::middleware('role:admin')->group(function () {
-            Route::apiResource('boucheries', BoucherieController::class);
             Route::apiResource('users', UserController::class);
         });
 
         // ── Admin + Boucher ──────────────────────────────────────────────────
         Route::middleware('role:admin|boucher')->group(function () {
+            Route::apiResource('boucheries', BoucherieController::class);
+
             Route::apiResource('fournisseurs', FournisseurController::class);
             Route::apiResource('clients', ClientController::class);
             Route::apiResource('produits', ProduitController::class);
@@ -60,29 +64,56 @@ Route::prefix('v1')->group(function () {
             Route::get('animaux',          [AnimalController::class, 'index']);
             Route::get('animaux/{animal}', [AnimalController::class, 'show']);
 
-            Route::get('abattages',            [AbattageController::class, 'index']);
-            Route::post('abattages',           [AbattageController::class, 'store']);
-            Route::get('abattages/{abattage}', [AbattageController::class, 'show']);
-
             Route::get('stocks',                    [StockController::class, 'index']);
             Route::get('stocks/{stock}',            [StockController::class, 'show']);
             Route::get('stocks/{stock}/mouvements', [StockController::class, 'mouvements']);
             Route::post('stocks/{stock}/ajuster',   [StockController::class, 'ajuster']);
-        });
 
-        // ── Admin + Boucher + Caissier ───────────────────────────────────────
-        Route::middleware('role:admin|boucher|caissier')->group(function () {
             Route::get('ventes',                  [VenteController::class, 'index']);
             Route::post('ventes',                 [VenteController::class, 'store']);
             Route::get('ventes/{vente}',          [VenteController::class, 'show']);
             Route::patch('ventes/{vente}/statut', [VenteController::class, 'updateStatut']);
             Route::delete('ventes/{vente}',       [VenteController::class, 'destroy']);
 
-            Route::get('ventes/{vente}/paiements',  [PaiementController::class, 'index']);
             Route::post('ventes/{vente}/paiements', [PaiementController::class, 'store']);
 
             Route::post('ventes/{vente}/livraison',  [LivraisonController::class, 'store']);
             Route::patch('ventes/{vente}/livraison', [LivraisonController::class, 'update']);
+        });
+
+        // ── Admin + Boucher + Fournisseur ────────────────────────────────────
+        Route::middleware('role:admin|boucher|fournisseur')->group(function () {
+            Route::get('abattages',            [AbattageController::class, 'index']);
+            Route::post('abattages',           [AbattageController::class, 'store']);
+            Route::get('abattages/{abattage}', [AbattageController::class, 'show']);
+
+            Route::get('ventes/{vente}/paiements', [PaiementController::class, 'index']);
+
+            // Distributions
+            Route::get('distributions',                      [DistributionController::class, 'index']);
+            Route::get('distributions/{distribution}',       [DistributionController::class, 'show']);
+            Route::patch('distributions/{distribution}/annuler', [DistributionController::class, 'annuler']);
+
+            // Réceptions
+            Route::get('receptions',             [ReceptionController::class, 'index']);
+            Route::get('receptions/{reception}', [ReceptionController::class, 'show']);
+
+            // Versements
+            Route::get('versements',             [VersementController::class, 'index']);
+            Route::get('versements/{versement}', [VersementController::class, 'show']);
+        });
+
+        // ── Fournisseur uniquement ────────────────────────────────────────────
+        Route::middleware('role:fournisseur|admin')->group(function () {
+            Route::post('distributions',                             [DistributionController::class, 'store']);
+            Route::patch('versements/{versement}/valider',           [VersementController::class, 'valider']);
+            Route::patch('versements/{versement}/rejeter',           [VersementController::class, 'rejeter']);
+        });
+
+        // ── Boucher uniquement (création réception et versement) ─────────────
+        Route::middleware('role:boucher|admin')->group(function () {
+            Route::post('receptions',  [ReceptionController::class, 'store']);
+            Route::post('versements',  [VersementController::class, 'store']);
         });
     });
 });
