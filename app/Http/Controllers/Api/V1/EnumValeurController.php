@@ -29,6 +29,7 @@ class EnumValeurController extends Controller
      * Retourne toutes les valeurs globales + celles de la boucherie de l'utilisateur.
      *
      * @urlParam type string required Le type d'enum. Exemples : espece_animal, categorie_produit, unite_produit, mode_paiement, statut_animal, type_vente, statut_vente, statut_livraison, type_mouvement. Example: espece_animal
+     * @response {"data":[{"id":1,"type":"espece_animal","valeur":"bovin","libelle":"Bovin","systeme":true,"boucherie_id":null,"ordre":1},{"id":2,"type":"espece_animal","valeur":"ovin","libelle":"Ovin","systeme":true,"boucherie_id":null,"ordre":2}]}
      */
     public function index(Request $request, string $type): AnonymousResourceCollection
     {
@@ -43,6 +44,8 @@ class EnumValeurController extends Controller
      * Ajoute une nouvelle valeur pour le type donné, rattachée à la boucherie de l'utilisateur.
      *
      * @urlParam type string required Le type d'enum. Example: espece_animal
+     * @response 201 {"data":{"id":5,"type":"espece_animal","valeur":"porcin","libelle":"Porcin","systeme":false,"boucherie_id":1,"ordre":5},"message":"Valeur ajoutée avec succès."}
+     * @response 422 {"message":"The valeur field is required.","errors":{"valeur":["The valeur field is required."]}}
      */
     public function store(StoreEnumValeurRequest $request, string $type): JsonResponse
     {
@@ -61,6 +64,9 @@ class EnumValeurController extends Controller
      *
      * @urlParam type string required Le type d'enum. Example: espece_animal
      * @urlParam id string required UUID de la valeur. Example: 9d4b2c1a-...
+     * @response {"data":{"id":5,"type":"espece_animal","valeur":"porcin","libelle":"Porc","systeme":false,"boucherie_id":1,"ordre":3},"message":"Valeur mise à jour avec succès."}
+     * @response 404 {"message":"Not found."}
+     * @response 422 {"message":"The libelle field is required.","errors":{"libelle":["The libelle field is required."]}}
      */
     public function update(UpdateEnumValeurRequest $request, string $type, string $id): JsonResponse
     {

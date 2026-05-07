@@ -22,6 +22,11 @@ class FournisseurController extends Controller
 {
     public function __construct(private readonly FournisseurService $service) {}
 
+    /**
+     * Liste des fournisseurs
+     *
+     * @response {"data":[{"id":1,"boucherie_id":1,"nom":"Élevage Dupont","contact":"Jean Dupont","email":"jean@elevage.com","telephone":"+33612345678","adresse":"Route de la Ferme, 75001 Paris","created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"}],"links":{"first":"http://localhost/api/v1/fournisseurs?page=1","last":"http://localhost/api/v1/fournisseurs?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"path":"http://localhost/api/v1/fournisseurs","per_page":15,"to":1,"total":1}}
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         return FournisseurResource::collection(
@@ -29,6 +34,12 @@ class FournisseurController extends Controller
         );
     }
 
+    /**
+     * Créer un fournisseur
+     *
+     * @response 201 {"data":{"id":1,"boucherie_id":1,"nom":"Élevage Dupont","contact":"Jean Dupont","email":"jean@elevage.com","telephone":"+33612345678","adresse":"Route de la Ferme, 75001 Paris","created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"},"message":"Fournisseur créé avec succès."}
+     * @response 422 {"message":"The nom field is required.","errors":{"nom":["The nom field is required."]}}
+     */
     public function store(StoreFournisseurRequest $request): JsonResponse
     {
         $fournisseur = $this->service->create(
@@ -42,6 +53,12 @@ class FournisseurController extends Controller
         ], 201);
     }
 
+    /**
+     * Détail d'un fournisseur
+     *
+     * @response {"data":{"id":1,"boucherie_id":1,"nom":"Élevage Dupont","contact":"Jean Dupont","email":"jean@elevage.com","telephone":"+33612345678","adresse":"Route de la Ferme, 75001 Paris","created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"}}
+     * @response 404 {"message":"Not found."}
+     */
     public function show(string $id): JsonResponse
     {
         $fournisseur = $this->service->findById($id);
@@ -52,6 +69,13 @@ class FournisseurController extends Controller
         ]);
     }
 
+    /**
+     * Mettre à jour un fournisseur
+     *
+     * @response {"data":{"id":1,"boucherie_id":1,"nom":"Élevage Dupont","contact":"Jean Dupont","email":"jean@elevage.com","telephone":"+33612345678","adresse":"Route de la Ferme, 75001 Paris","created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"},"message":"Fournisseur mis à jour avec succès."}
+     * @response 404 {"message":"Not found."}
+     * @response 422 {"message":"The nom field is required.","errors":{"nom":["The nom field is required."]}}
+     */
     public function update(UpdateFournisseurRequest $request, string $id): JsonResponse
     {
         $fournisseur = $this->service->findById($id);
@@ -65,6 +89,12 @@ class FournisseurController extends Controller
         ]);
     }
 
+    /**
+     * Supprimer un fournisseur
+     *
+     * @response 204 {}
+     * @response 404 {"message":"Not found."}
+     */
     public function destroy(string $id): JsonResponse
     {
         $fournisseur = $this->service->findById($id);

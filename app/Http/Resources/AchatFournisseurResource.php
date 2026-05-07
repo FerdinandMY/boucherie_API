@@ -7,6 +7,19 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @responseField id integer ID de l'achat.
+ * @responseField boucherie_id integer ID de la boucherie.
+ * @responseField fournisseur_id integer ID du fournisseur.
+ * @responseField fournisseur object Détail du fournisseur (si chargé).
+ * @responseField user_id integer ID de l'utilisateur ayant enregistré l'achat.
+ * @responseField date_achat string Date de l'achat (YYYY-MM-DD).
+ * @responseField montant_total number Montant total en FCFA.
+ * @responseField notes string Notes libres.
+ * @responseField animaux object[] Liste des animaux achetés (si chargée).
+ * @responseField created_at string Date de création (ISO 8601).
+ * @responseField updated_at string Date de modification (ISO 8601).
+ */
 class AchatFournisseurResource extends JsonResource
 {
     public function toArray(Request $request): array

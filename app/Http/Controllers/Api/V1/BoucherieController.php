@@ -21,11 +21,24 @@ class BoucherieController extends Controller
 {
     public function __construct(private readonly BoucherieService $service) {}
 
+    /**
+     * Liste des boucheries
+     *
+     * Retourne la liste paginée de toutes les boucheries.
+     *
+     * @response {"data":[{"id":1,"nom":"Boucherie Centrale","adresse":"12 rue du Marché","ville":"Paris","telephone":"+33612345678","actif":true,"created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"}],"links":{"first":"http://localhost/api/v1/boucheries?page=1","last":"http://localhost/api/v1/boucheries?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"path":"http://localhost/api/v1/boucheries","per_page":15,"to":1,"total":1}}
+     */
     public function index(): AnonymousResourceCollection
     {
         return BoucherieResource::collection($this->service->paginate());
     }
 
+    /**
+     * Créer une boucherie
+     *
+     * @response 201 {"data":{"id":1,"nom":"Boucherie Centrale","adresse":"12 rue du Marché","ville":"Paris","telephone":"+33612345678","actif":true,"created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"},"message":"Boucherie créée avec succès."}
+     * @response 422 {"message":"The nom field is required.","errors":{"nom":["The nom field is required."]}}
+     */
     public function store(StoreBoucherieRequest $request): JsonResponse
     {
         $boucherie = $this->service->create($request->validated());
@@ -36,6 +49,12 @@ class BoucherieController extends Controller
         ], 201);
     }
 
+    /**
+     * Détail d'une boucherie
+     *
+     * @response {"data":{"id":1,"nom":"Boucherie Centrale","adresse":"12 rue du Marché","ville":"Paris","telephone":"+33612345678","actif":true,"created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"}}
+     * @response 404 {"message":"Not found."}
+     */
     public function show(string $id): JsonResponse
     {
         return response()->json([
@@ -43,6 +62,13 @@ class BoucherieController extends Controller
         ]);
     }
 
+    /**
+     * Mettre à jour une boucherie
+     *
+     * @response {"data":{"id":1,"nom":"Boucherie Centrale","adresse":"12 rue du Marché","ville":"Paris","telephone":"+33612345678","actif":true,"created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"},"message":"Boucherie mise à jour avec succès."}
+     * @response 404 {"message":"Not found."}
+     * @response 422 {"message":"The nom field is required.","errors":{"nom":["The nom field is required."]}}
+     */
     public function update(UpdateBoucherieRequest $request, string $id): JsonResponse
     {
         $boucherie = $this->service->update($id, $request->validated());
@@ -53,6 +79,12 @@ class BoucherieController extends Controller
         ]);
     }
 
+    /**
+     * Supprimer une boucherie
+     *
+     * @response 204 {}
+     * @response 404 {"message":"Not found."}
+     */
     public function destroy(string $id): JsonResponse
     {
         $this->service->delete($id);

@@ -22,6 +22,11 @@ class ProduitController extends Controller
 {
     public function __construct(private readonly ProduitService $service) {}
 
+    /**
+     * Liste des produits
+     *
+     * @response {"data":[{"id":1,"boucherie_id":1,"nom":"Côte de bœuf","categorie":"boeuf","unite":"kg","prix_unitaire":2500,"description":"Côte à l'os maturée 21 jours","created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"}],"links":{"first":"http://localhost/api/v1/produits?page=1","last":"http://localhost/api/v1/produits?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"path":"http://localhost/api/v1/produits","per_page":15,"to":1,"total":1}}
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         return ProduitResource::collection(
@@ -29,6 +34,12 @@ class ProduitController extends Controller
         );
     }
 
+    /**
+     * Créer un produit
+     *
+     * @response 201 {"data":{"id":1,"boucherie_id":1,"nom":"Côte de bœuf","categorie":"boeuf","unite":"kg","prix_unitaire":2500,"description":"Côte à l'os maturée 21 jours","created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"},"message":"Produit créé avec succès."}
+     * @response 422 {"message":"The nom field is required.","errors":{"nom":["The nom field is required."]}}
+     */
     public function store(StoreProduitRequest $request): JsonResponse
     {
         $produit = $this->service->create(
@@ -42,6 +53,12 @@ class ProduitController extends Controller
         ], 201);
     }
 
+    /**
+     * Détail d'un produit
+     *
+     * @response {"data":{"id":1,"boucherie_id":1,"nom":"Côte de bœuf","categorie":"boeuf","unite":"kg","prix_unitaire":2500,"description":"Côte à l'os maturée 21 jours","created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"}}
+     * @response 404 {"message":"Not found."}
+     */
     public function show(string $id): JsonResponse
     {
         $produit = $this->service->findById($id);
@@ -52,6 +69,13 @@ class ProduitController extends Controller
         ]);
     }
 
+    /**
+     * Mettre à jour un produit
+     *
+     * @response {"data":{"id":1,"boucherie_id":1,"nom":"Côte de bœuf","categorie":"boeuf","unite":"kg","prix_unitaire":2500,"description":"Côte à l'os maturée 21 jours","created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"},"message":"Produit mis à jour avec succès."}
+     * @response 404 {"message":"Not found."}
+     * @response 422 {"message":"The nom field is required.","errors":{"nom":["The nom field is required."]}}
+     */
     public function update(UpdateProduitRequest $request, string $id): JsonResponse
     {
         $produit = $this->service->findById($id);
@@ -65,6 +89,12 @@ class ProduitController extends Controller
         ]);
     }
 
+    /**
+     * Supprimer un produit
+     *
+     * @response 204 {}
+     * @response 404 {"message":"Not found."}
+     */
     public function destroy(string $id): JsonResponse
     {
         $produit = $this->service->findById($id);

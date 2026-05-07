@@ -7,6 +7,22 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @responseField id integer ID de la vente.
+ * @responseField boucherie_id integer ID de la boucherie.
+ * @responseField user_id integer ID du vendeur.
+ * @responseField client_id integer ID du client.
+ * @responseField client object Détail du client (si chargé).
+ * @responseField type_vente string Type de vente : comptoir, livraison.
+ * @responseField statut string Statut : en_attente, payee, annulee.
+ * @responseField montant_total number Montant total en FCFA.
+ * @responseField notes string Notes libres.
+ * @responseField lignes object[] Lignes de vente (si chargées).
+ * @responseField paiements object[] Paiements enregistrés (si chargés).
+ * @responseField livraison object Livraison associée (si chargée).
+ * @responseField created_at string Date de création (ISO 8601).
+ * @responseField updated_at string Date de modification (ISO 8601).
+ */
 class VenteResource extends JsonResource
 {
     public function toArray(Request $request): array

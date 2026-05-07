@@ -7,6 +7,17 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @responseField id integer ID du produit.
+ * @responseField boucherie_id integer ID de la boucherie.
+ * @responseField nom string Nom du produit.
+ * @responseField categorie string Catégorie (ex: boeuf, agneau, volaille).
+ * @responseField unite string Unité de vente (ex: kg, piece).
+ * @responseField prix_unitaire number Prix par unité en FCFA.
+ * @responseField description string Description du produit.
+ * @responseField created_at string Date de création (ISO 8601).
+ * @responseField updated_at string Date de modification (ISO 8601).
+ */
 class ProduitResource extends JsonResource
 {
     public function toArray(Request $request): array

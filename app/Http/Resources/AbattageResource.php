@@ -7,6 +7,20 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @responseField id integer ID de l'abattage.
+ * @responseField boucherie_id integer ID de la boucherie.
+ * @responseField animal_id integer ID de l'animal abattu.
+ * @responseField animal object Détail de l'animal (si chargé).
+ * @responseField user_id integer ID de l'utilisateur ayant enregistré l'abattage.
+ * @responseField date_abattage string Date d'abattage (YYYY-MM-DD).
+ * @responseField poids_carcasse_kg number Poids carcasse en kilogrammes.
+ * @responseField rendement_pct number Rendement carcasse en pourcentage.
+ * @responseField notes string Notes libres.
+ * @responseField stocks object[] Stocks générés par l'abattage (si chargés).
+ * @responseField created_at string Date de création (ISO 8601).
+ * @responseField updated_at string Date de modification (ISO 8601).
+ */
 class AbattageResource extends JsonResource
 {
     public function toArray(Request $request): array

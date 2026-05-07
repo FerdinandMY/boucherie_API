@@ -7,6 +7,15 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @responseField id integer ID de la ligne.
+ * @responseField vente_id integer ID de la vente.
+ * @responseField produit_id integer ID du produit.
+ * @responseField produit object Détail du produit (si chargé).
+ * @responseField quantite number Quantité vendue.
+ * @responseField prix_unitaire number Prix unitaire au moment de la vente en FCFA.
+ * @responseField sous_total number Sous-total de la ligne (quantite × prix_unitaire).
+ */
 class LigneVenteResource extends JsonResource
 {
     public function toArray(Request $request): array
