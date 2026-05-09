@@ -231,6 +231,7 @@
     <a class="pill pill-admin"   href="#admin">Administrateur</a>
     <a class="pill pill-boucher" href="#boucher">Boucher</a>
     <a class="pill pill-fourn"   href="#fournisseur">Fournisseur</a>
+    <a class="pill pill-global"  href="#stats">Statistiques</a>
     <a class="pill pill-global"  href="#comptes">Comptes de test</a>
 </nav>
 
@@ -641,6 +642,123 @@
                 </div>
             </div>
 
+        </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════
+         STATISTIQUES
+    ══════════════════════════════════════════ -->
+    <section class="section" id="stats">
+        <div class="section-header">
+            <span class="badge" style="background:#0ea5e9;color:#fff;">📊 Stats</span>
+            <h2 class="section-title">Tableau de bord — Statistiques</h2>
+        </div>
+
+        <div class="info-box" style="border-left-color:#0ea5e9;margin-bottom:1.25rem;">
+            <strong>Endpoint unique :</strong>
+            <code>GET /api/v1/stats?periode=semaine|mois|annee</code><br>
+            La réponse s'adapte automatiquement au rôle de l'utilisateur connecté. La période par défaut est <strong>mois</strong> (30 derniers jours).
+        </div>
+
+        <!-- ADMIN -->
+        <div style="margin-bottom:2rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+                <span class="badge badge-admin">👑 Admin</span>
+                <span style="font-weight:600;font-size:1rem;">Vue globale</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;">
+                <div class="step-body">
+                    <h3>Ventes</h3>
+                    <p>Nombre total, montant total et montant moyen des ventes sur la période, toutes boucheries confondues.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Stocks</h3>
+                    <p>Nombre total de références en stock et nombre de produits en alerte de rupture.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Versements</h3>
+                    <p>Répartition des versements par statut (en_attente, valides, rejetés) avec montants.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Top produits</h3>
+                    <p>5 produits les plus vendus (quantité + chiffre d'affaires) sur la période.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Top boucheries</h3>
+                    <p>5 boucheries avec le plus grand chiffre d'affaires sur la période.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Top fournisseurs</h3>
+                    <p>5 fournisseurs ayant reçu le plus de versements validés.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOUCHER -->
+        <div style="margin-bottom:2rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+                <span class="badge badge-boucher">🔪 Boucher</span>
+                <span style="font-weight:600;font-size:1rem;">Pilotage de la boucherie</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;">
+                <div class="step-body">
+                    <h3>Ventes</h3>
+                    <p>Nombre, montant total et montant moyen des ventes de sa boucherie sur la période.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Stocks & alertes</h3>
+                    <p>Nombre de références, nombre d'alertes de rupture et liste des produits sous le seuil (nom, quantité, seuil).</p>
+                </div>
+                <div class="step-body">
+                    <h3>Distributions</h3>
+                    <p>Lots reçus du fournisseur par statut : en attente, acceptés, rejetés.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Versements</h3>
+                    <p>Versements effectués au fournisseur : en attente de validation, validés, rejetés.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Top produits</h3>
+                    <p>5 produits les plus vendus dans cette boucherie.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Top clients</h3>
+                    <p>5 clients avec le plus d'achats (nombre de ventes + montant total).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOURNISSEUR -->
+        <div>
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+                <span class="badge badge-fourn">🐄 Fournisseur</span>
+                <span style="font-weight:600;font-size:1rem;">Suivi des créances</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;">
+                <div class="step-body">
+                    <h3>Abattages</h3>
+                    <p>Nombre d'abattages, poids total de carcasse (kg) et rendement moyen (%) sur la période.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Distributions</h3>
+                    <p>Lots envoyés aux boucheries par statut : en attente, acceptés, rejetés.</p>
+                </div>
+                <div class="step-body">
+                    <h3>Versements</h3>
+                    <p>Montants reçus par statut + <strong>total dû</strong> (en_attente + validé) vs <strong>total perçu</strong> (validé uniquement).</p>
+                </div>
+                <div class="step-body">
+                    <h3>Top boucheries clientes</h3>
+                    <p>5 boucheries ayant reçu le plus de distributions (nombre et quantité totale).</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box" style="margin-top:1.25rem;">
+            <strong>Exemple de requête :</strong><br>
+            <code>GET /api/v1/stats?periode=semaine</code><br>
+            <code>Authorization: Bearer &lt;token&gt;</code>
         </div>
     </section>
 

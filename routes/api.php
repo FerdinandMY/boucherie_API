@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\LivraisonController;
 use App\Http\Controllers\Api\V1\PaiementController;
 use App\Http\Controllers\Api\V1\ProduitController;
 use App\Http\Controllers\Api\V1\ReceptionController;
+use App\Http\Controllers\Api\V1\StatsController;
 use App\Http\Controllers\Api\V1\StockController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\VenteController;
@@ -35,6 +36,9 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
+
+        // ── Statistiques — tous les rôles authentifiés ───────────────────────
+        Route::get('stats', [StatsController::class, 'index']);
 
         // ── Référentiels (Enums) — tous les rôles authentifiés ──────────────
         Route::prefix('referentiels/{type}')->group(function () {
