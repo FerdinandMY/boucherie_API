@@ -16,11 +16,12 @@ class UpdateFournisseurRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom'       => ['sometimes', 'string', 'max:255'],
-            'contact'   => ['nullable', 'string', 'max:255'],
-            'email'     => ['nullable', 'email', 'max:255'],
-            'telephone' => ['nullable', 'string', 'max:20'],
-            'adresse'   => ['nullable', 'string', 'max:500'],
+            'nom'          => ['sometimes', 'string', 'max:255'],
+            'contact'      => ['sometimes', 'nullable', 'string', 'max:255'],
+            'email'        => ['sometimes', 'nullable', 'email', 'max:255'],
+            'telephone'    => ['sometimes', 'nullable', 'string', 'max:20'],
+            'adresse'      => ['sometimes', 'nullable', 'string', 'max:500'],
+            'boucherie_id' => ['sometimes', 'nullable', 'uuid', 'exists:boucheries,id'],
         ];
     }
 }

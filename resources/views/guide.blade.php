@@ -360,7 +360,8 @@
                         </div>
                     </div>
                     <p style="margin-top:.6rem;font-size:.82rem;color:#64748b;">
-                        La création d'un fournisseur génère automatiquement l'entité fournisseur associée. Un boucher ou admin doit obligatoirement avoir un <code>boucherie_id</code>.
+                        Un boucher ou admin doit obligatoirement avoir un <code>boucherie_id</code>.<br>
+                        Pour un fournisseur, ni <code>boucherie_id</code> ni l'objet <code>fournisseur</code> ne sont obligatoires à la création — l'admin peut compléter l'entité fournisseur plus tard via <code>PATCH /api/v1/users/{id}</code>.
                     </p>
                     <span class="endpoint" style="margin-top:.5rem;"><span class="method post">POST</span>/api/v1/users</span>
                     &nbsp;

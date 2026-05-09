@@ -21,9 +21,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
  *
  * Les rôles disponibles sont : **admin**, **boucher**, **fournisseur**.
  *
- * La création d'un fournisseur crée automatiquement l'entité fournisseur associée.
  * Un boucher ou admin doit obligatoirement être rattaché à une boucherie (`boucherie_id`).
- * Un fournisseur n'a pas de `boucherie_id` mais nécessite un objet `fournisseur` avec au minimum le `nom`.
+ * Un fournisseur n'a pas de `boucherie_id`. L'objet `fournisseur` est optionnel à la création ;
+ * l'admin peut compléter ou modifier l'entité fournisseur ultérieurement via `PATCH /users/{id}`.
  */
 class UserController extends Controller
 {

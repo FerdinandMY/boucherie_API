@@ -27,12 +27,12 @@ class StoreUserRequest extends FormRequest
                 'exists:boucheries,id',
             ],
 
-            // Obligatoire uniquement quand le rôle est fournisseur
-            'fournisseur.nom'       => ['required_if:role,fournisseur', 'nullable', 'string', 'max:150'],
-            'fournisseur.contact'   => ['nullable', 'string', 'max:150'],
-            'fournisseur.telephone' => ['nullable', 'string', 'max:20'],
-            'fournisseur.email'     => ['nullable', 'email', 'max:150'],
-            'fournisseur.adresse'   => ['nullable', 'string', 'max:500'],
+            // Optionnel même pour le rôle fournisseur — l'admin peut compléter l'entité plus tard
+            'fournisseur.nom'       => ['sometimes', 'nullable', 'string', 'max:150'],
+            'fournisseur.contact'   => ['sometimes', 'nullable', 'string', 'max:150'],
+            'fournisseur.telephone' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'fournisseur.email'     => ['sometimes', 'nullable', 'email', 'max:150'],
+            'fournisseur.adresse'   => ['sometimes', 'nullable', 'string', 'max:500'],
         ];
     }
 
@@ -40,7 +40,6 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'boucherie_id.required' => 'La boucherie est obligatoire pour ce rôle.',
-            'fournisseur.nom.required_if' => 'Le nom de l\'entité fournisseur est obligatoire.',
         ];
     }
 }
