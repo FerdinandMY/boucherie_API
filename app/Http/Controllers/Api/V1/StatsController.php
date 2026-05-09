@@ -13,30 +13,24 @@ use Illuminate\Http\Request;
  * @group Statistiques
  * @authenticated
  *
- * Tableau de bord adapté au rôle de l'utilisateur connecté.
- *
- * Le paramètre `periode` filtre les données sur la fenêtre choisie :
+ * Indicateurs clés par rôle. Le paramètre `periode` filtre les données :
  * - `semaine` — 7 derniers jours
  * - `mois` — 30 derniers jours (défaut)
  * - `annee` — 12 derniers mois
- *
- * La réponse varie selon le rôle :
- * - **admin** — vue globale : ventes, stocks, versements, tops boucheries/produits/fournisseurs
- * - **boucher** — pilotage de sa boucherie : ventes, stocks, alertes, distributions, versements, tops produits/clients
- * - **fournisseur** — suivi créances : abattages, distributions, versements (dû vs perçu), tops boucheries clientes
  */
 class StatsController extends Controller
 {
     public function __construct(private readonly StatsService $service) {}
 
     /**
-     * Tableau de bord
+     * Stats Administrateur
      *
-     * Retourne les indicateurs clés adaptés au rôle de l'utilisateur connecté.
+     * Vue globale : ventes toutes boucheries, état des stocks, versements par statut,
+     * top 5 produits, top 5 boucheries et top 5 fournisseurs.
      *
      * @queryParam periode string Fenêtre temporelle : `semaine`, `mois` (défaut), `annee`. Example: mois
      *
-     * @response scenario="Admin" {
+     * @response {
      *   "data": {
      *     "periode": "mois",
      *     "ventes": { "total": 120, "montant_total": 3600000, "montant_moyen": 30000 },
@@ -51,8 +45,23 @@ class StatsController extends Controller
      *     "top_fournisseurs":[{ "fournisseur": "Jean Éleveur", "montant_recu": 900000 }]
      *   }
      * }
+     */
+    public function admin(Request $request): JsonResponse
+    {
+        $periode = $this->resolvePeriode($request);
+
+        return response()->json(['data' => $this->service->forAdmin($periode)]);
+    }
+
+    /**
+     * Stats Boucher
      *
-     * @response scenario="Boucher" {
+     * Pilotage de la boucherie : ventes, alertes stock, distributions reçues,
+     * versements au fournisseur, top 5 produits et top 5 clients.
+     *
+     * @queryParam periode string Fenêtre temporelle : `semaine`, `mois` (défaut), `annee`. Example: mois
+     *
+     * @response {
      *   "data": {
      *     "periode": "mois",
      *     "ventes": { "total": 45, "montant_total": 1350000, "montant_moyen": 30000 },
@@ -71,8 +80,24 @@ class StatsController extends Controller
      *     "top_clients":  [{ "client": "Ali Traoré", "nb_ventes": 8, "total_achats": 240000 }]
      *   }
      * }
+     */
+    public function boucher(Request $request): JsonResponse
+    {
+        $periode = $this->resolvePeriode($request);
+        $user    = $request->user();
+
+        return response()->json(['data' => $this->service->forBoucher((string) $user->boucherie_id, $periode)]);
+    }
+
+    /**
+     * Stats Fournisseur
      *
-     * @response scenario="Fournisseur" {
+     * Suivi des créances : abattages et rendement, distributions par statut,
+     * versements reçus (total dû vs perçu), top 5 boucheries clientes.
+     *
+     * @queryParam periode string Fenêtre temporelle : `semaine`, `mois` (défaut), `annee`. Example: mois
+     *
+     * @response {
      *   "data": {
      *     "periode": "mois",
      *     "abattages": { "total": 12, "poids_total_kg": 2400, "rendement_moyen": 58.5 },
@@ -88,21 +113,18 @@ class StatsController extends Controller
      *   }
      * }
      */
-    public function index(Request $request): JsonResponse
+    public function fournisseur(Request $request): JsonResponse
     {
-        $periode = in_array($request->query('periode'), ['semaine', 'mois', 'annee'], true)
+        $periode = $this->resolvePeriode($request);
+        $user    = $request->user();
+
+        return response()->json(['data' => $this->service->forFournisseur((string) $user->id, $periode)]);
+    }
+
+    private function resolvePeriode(Request $request): string
+    {
+        return in_array($request->query('periode'), ['semaine', 'mois', 'annee'], true)
             ? $request->query('periode')
             : 'mois';
-
-        $user = $request->user();
-
-        $data = match (true) {
-            $user->hasRole('admin')       => $this->service->forAdmin($periode),
-            $user->hasRole('boucher')     => $this->service->forBoucher((string) $user->boucherie_id, $periode),
-            $user->hasRole('fournisseur') => $this->service->forFournisseur((string) $user->id, $periode),
-            default                       => [],
-        };
-
-        return response()->json(['data' => $data]);
     }
 }

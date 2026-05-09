@@ -37,8 +37,10 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
 
-        // ── Statistiques — tous les rôles authentifiés ───────────────────────
-        Route::get('stats', [StatsController::class, 'index']);
+        // ── Statistiques ─────────────────────────────────────────────────────
+        Route::middleware('role:admin')->get('stats/admin',       [StatsController::class, 'admin']);
+        Route::middleware('role:admin|boucher')->get('stats/boucher',     [StatsController::class, 'boucher']);
+        Route::middleware('role:fournisseur|admin')->get('stats/fournisseur', [StatsController::class, 'fournisseur']);
 
         // ── Référentiels (Enums) — tous les rôles authentifiés ──────────────
         Route::prefix('referentiels/{type}')->group(function () {

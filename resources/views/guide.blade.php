@@ -656,9 +656,13 @@
         </div>
 
         <div class="info-box" style="border-left-color:#0ea5e9;margin-bottom:1.25rem;">
-            <strong>Endpoint unique :</strong>
-            <code>GET /api/v1/stats?periode=semaine|mois|annee</code><br>
-            La réponse s'adapte automatiquement au rôle de l'utilisateur connecté. La période par défaut est <strong>mois</strong> (30 derniers jours).
+            Chaque rôle dispose de son propre endpoint dédié. Le paramètre <code>?periode=</code> est optionnel (défaut : <strong>mois</strong>).<br><br>
+            <span class="endpoint"><span class="method get">GET</span>/api/v1/stats/admin</span>
+            &nbsp;— Admin uniquement<br>
+            <span class="endpoint"><span class="method get">GET</span>/api/v1/stats/boucher</span>
+            &nbsp;— Boucher (+ admin)<br>
+            <span class="endpoint"><span class="method get">GET</span>/api/v1/stats/fournisseur</span>
+            &nbsp;— Fournisseur (+ admin)
         </div>
 
         <!-- ADMIN -->
