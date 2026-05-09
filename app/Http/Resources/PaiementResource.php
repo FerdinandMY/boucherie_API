@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @responseField id integer ID du paiement.
  * @responseField vente_id integer ID de la vente associée.
- * @responseField user_id integer ID du caissier.
+ * @responseField user_id integer ID du boucher ayant enregistré le paiement.
  * @responseField mode_paiement string Mode : especes, mobile_money, carte.
  * @responseField montant number Montant payé en FCFA.
  * @responseField date_paiement string Date du paiement (YYYY-MM-DD).

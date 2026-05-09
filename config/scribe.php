@@ -49,11 +49,11 @@ L'API utilise **Laravel Sanctum** (tokens Bearer). Toutes les routes (sauf `/aut
 
 ## Rôles
 
-| Rôle      | Accès |
-|-----------|-------|
-| `admin`   | Tout (boucheries, utilisateurs, …) |
-| `boucher` | Fournisseurs, animaux, abattages, stocks, ventes |
-| `caissier`| Ventes, paiements, livraisons |
+| Rôle          | Accès |
+|---------------|-------|
+| `admin`       | Tout (boucheries, utilisateurs, …) |
+| `boucher`     | Fournisseurs, animaux, abattages, stocks, ventes, paiements, versements |
+| `fournisseur` | Abattages, distributions, réceptions, versements |
 
 ## Codes d'erreur courants
 

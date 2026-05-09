@@ -22,7 +22,7 @@ class RegisterUserRequest extends FormRequest
             'password'              => ['required', 'string', 'min:8'],
             'password_confirmation' => ['required', 'same:password'],
             'boucherie_id'          => ['nullable', 'uuid', 'exists:boucheries,id'],
-            'role'                  => ['nullable', 'string', Rule::in(['admin', 'boucher', 'caissier'])],
+            'role'                  => ['nullable', 'string', Rule::in(['admin', 'boucher', 'fournisseur'])],
         ];
     }
 }
