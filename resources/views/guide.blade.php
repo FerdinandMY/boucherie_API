@@ -331,8 +331,38 @@
                 <div class="step-num num-admin">3</div>
                 <div class="step-body">
                     <h3>Créer les comptes utilisateurs</h3>
-                    <p>Crée les comptes boucher et fournisseur, leur assigne un rôle et les rattache à une boucherie.</p>
-                    <span class="endpoint"><span class="method post">POST</span>/api/v1/users</span>
+                    <p>L'admin crée les comptes pour tous les rôles. Le corps de la requête diffère selon le rôle :</p>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem;">
+                        <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:.75rem;">
+                            <div style="font-weight:700;font-size:.82rem;color:#4338ca;margin-bottom:.4rem;">BOUCHER / ADMIN</div>
+                            <pre style="font-size:.75rem;color:#334155;white-space:pre-wrap;margin:0;">{
+  "name": "Alice Martin",
+  "email": "alice@test.com",
+  "password": "motdepasse8",
+  "role": "boucher",
+  "boucherie_id": "&lt;uuid&gt;"
+}</pre>
+                        </div>
+                        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.75rem;">
+                            <div style="font-weight:700;font-size:.82rem;color:#15803d;margin-bottom:.4rem;">FOURNISSEUR</div>
+                            <pre style="font-size:.75rem;color:#334155;white-space:pre-wrap;margin:0;">{
+  "name": "Jean Éleveur",
+  "email": "jean@elevage.com",
+  "password": "motdepasse8",
+  "role": "fournisseur",
+  "fournisseur": {
+    "nom": "Élevage du Sahel",
+    "contact": "Jean Éleveur",
+    "telephone": "+22600000001"
+  }
+}</pre>
+                        </div>
+                    </div>
+                    <p style="margin-top:.6rem;font-size:.82rem;color:#64748b;">
+                        La création d'un fournisseur génère automatiquement l'entité fournisseur associée. Un boucher ou admin doit obligatoirement avoir un <code>boucherie_id</code>.
+                    </p>
+                    <span class="endpoint" style="margin-top:.5rem;"><span class="method post">POST</span>/api/v1/users</span>
                     &nbsp;
                     <span class="endpoint"><span class="method get">GET</span>/api/v1/users</span>
                 </div>

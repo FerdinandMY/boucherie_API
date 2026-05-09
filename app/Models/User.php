@@ -30,6 +30,11 @@ class User extends Authenticatable
         return $this->belongsTo(Boucherie::class, 'boucherie_id');
     }
 
+    public function fournisseur(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Fournisseur::class, 'user_id');
+    }
+
     public function ventes(): HasMany
     {
         return $this->hasMany(Vente::class, 'user_id');

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Fournisseur;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
@@ -22,37 +24,65 @@ class UserService
 
     public function findById(string $id): User
     {
-        return User::with('roles')->findOrFail($id);
+        return User::with(['roles', 'boucherie', 'fournisseur'])->findOrFail($id);
     }
 
     public function create(array $data): User
     {
-        $role = $data['role'] ?? 'boucher';
-        unset($data['role']);
+        return DB::transaction(function () use ($data) {
+            $role            = $data['role'] ?? 'boucher';
+            $fournisseurData = $data['fournisseur'] ?? null;
+            unset($data['role'], $data['fournisseur']);
 
-        $data['password'] = Hash::make($data['password']);
-        $user = User::create($data);
-        $user->assignRole($role);
+            $data['password']     = Hash::make($data['password']);
+            $data['boucherie_id'] = $data['boucherie_id'] ?? null;
 
-        return $user->load('roles');
+            $user = User::create($data);
+            $user->assignRole($role);
+
+            if ($role === 'fournisseur' && $fournisseurData) {
+                Fournisseur::create([
+                    'user_id'      => $user->id,
+                    'boucherie_id' => null,
+                    'nom'          => $fournisseurData['nom'],
+                    'contact'      => $fournisseurData['contact']   ?? null,
+                    'telephone'    => $fournisseurData['telephone']  ?? null,
+                    'email'        => $fournisseurData['email']      ?? $user->email,
+                    'adresse'      => $fournisseurData['adresse']    ?? null,
+                ]);
+            }
+
+            return $user->load(['roles', 'boucherie']);
+        });
     }
 
     public function update(string $id, array $data): User
     {
-        $user = User::findOrFail($id);
+        return DB::transaction(function () use ($id, $data) {
+            $user            = User::findOrFail($id);
+            $fournisseurData = $data['fournisseur'] ?? null;
+            unset($data['fournisseur']);
 
-        if (isset($data['role'])) {
-            $user->syncRoles([$data['role']]);
-            unset($data['role']);
-        }
+            if (isset($data['role'])) {
+                $user->syncRoles([$data['role']]);
+                unset($data['role']);
+            }
 
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        }
+            if (isset($data['password'])) {
+                $data['password'] = Hash::make($data['password']);
+            }
 
-        $user->update($data);
+            $user->update($data);
 
-        return $user->load('roles');
+            if ($fournisseurData) {
+                Fournisseur::updateOrCreate(
+                    ['user_id' => $user->id],
+                    $fournisseurData,
+                );
+            }
+
+            return $user->load(['roles', 'boucherie']);
+        });
     }
 
     public function delete(string $id): void
