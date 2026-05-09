@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
-    public function paginate(string $boucherieId, int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, int $perPage = 15): LengthAwarePaginator
     {
         return User::query()
-            ->where('boucherie_id', $boucherieId)
+            ->when($boucherieId, fn ($q) => $q->where('boucherie_id', $boucherieId))
             ->with('roles')
             ->select(['id', 'name', 'email', 'boucherie_id', 'created_at'])
             ->latest()
