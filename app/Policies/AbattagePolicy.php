@@ -19,6 +19,11 @@ class AbattagePolicy
 
     public function view(User $user, Abattage $abattage): bool
     {
-        return $user->boucherie_id === $abattage->boucherie_id;
+        if ($user->hasRole('fournisseur')) {
+            return $abattage->animal?->fournisseur?->user_id === $user->id;
+        }
+
+        return $user->boucherie_id !== null
+            && $user->boucherie_id === $abattage->boucherie_id;
     }
 }

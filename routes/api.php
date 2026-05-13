@@ -64,12 +64,10 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('fournisseurs', FournisseurController::class);
             Route::apiResource('clients', ClientController::class);
 
-            Route::get('achats-fournisseurs',           [AchatFournisseurController::class, 'index']);
-            Route::post('achats-fournisseurs',          [AchatFournisseurController::class, 'store']);
-            Route::get('achats-fournisseurs/{achat}',   [AchatFournisseurController::class, 'show']);
+            Route::get('achats-fournisseurs',         [AchatFournisseurController::class, 'index']);
+            Route::post('achats-fournisseurs',        [AchatFournisseurController::class, 'store']);
+            Route::get('achats-fournisseurs/{achat}', [AchatFournisseurController::class, 'show']);
 
-            Route::get('animaux',          [AnimalController::class, 'index']);
-            Route::get('animaux/{animal}', [AnimalController::class, 'show']);
 
             Route::get('stocks',                    [StockController::class, 'index']);
             Route::get('stocks/{stock}',            [StockController::class, 'show']);
@@ -90,11 +88,13 @@ Route::prefix('v1')->group(function () {
 
         // ── Admin + Boucher + Fournisseur ────────────────────────────────────
         Route::middleware('role:admin|boucher|fournisseur')->group(function () {
-            // Lecture seule boucheries et produits (le fournisseur en a besoin pour distribuer)
+            // Lecture seule — nécessaire au fournisseur pour distribuer et gérer ses animaux
             Route::get('boucheries',             [BoucherieController::class, 'index']);
             Route::get('boucheries/{boucherie}', [BoucherieController::class, 'show']);
             Route::get('produits',               [ProduitController::class, 'index']);
             Route::get('produits/{produit}',     [ProduitController::class, 'show']);
+            Route::get('animaux',                [AnimalController::class, 'index']);
+            Route::get('animaux/{animal}',       [AnimalController::class, 'show']);
 
             Route::get('abattages',            [AbattageController::class, 'index']);
             Route::post('abattages',           [AbattageController::class, 'store']);
@@ -118,9 +118,14 @@ Route::prefix('v1')->group(function () {
 
         // ── Fournisseur uniquement ────────────────────────────────────────────
         Route::middleware('role:fournisseur|admin')->group(function () {
-            Route::post('distributions',                             [DistributionController::class, 'store']);
-            Route::patch('versements/{versement}/valider',           [VersementController::class, 'valider']);
-            Route::patch('versements/{versement}/rejeter',           [VersementController::class, 'rejeter']);
+            Route::post('distributions',                   [DistributionController::class, 'store']);
+            Route::patch('versements/{versement}/valider', [VersementController::class, 'valider']);
+            Route::patch('versements/{versement}/rejeter', [VersementController::class, 'rejeter']);
+
+            // Achats d'animaux (le fournisseur gère ses propres achats)
+            Route::get('achats-fournisseurs',         [AchatFournisseurController::class, 'index']);
+            Route::post('achats-fournisseurs',        [AchatFournisseurController::class, 'store']);
+            Route::get('achats-fournisseurs/{achat}', [AchatFournisseurController::class, 'show']);
         });
 
         // ── Boucher uniquement (création réception et versement) ─────────────

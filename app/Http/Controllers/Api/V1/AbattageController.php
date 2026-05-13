@@ -28,9 +28,13 @@ class AbattageController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        return AbattageResource::collection(
-            $this->service->paginate($request->user()->boucherie_id)
-        );
+        $user = $request->user();
+
+        $paginator = $user->hasRole('fournisseur')
+            ? $this->service->paginateByFournisseurUser($user->id)
+            : $this->service->paginate($user->boucherie_id);
+
+        return AbattageResource::collection($paginator);
     }
 
     /**

@@ -29,6 +29,14 @@ class VersementRepository
             ->paginate($perPage);
     }
 
+    public function paginateAll(int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->query()
+            ->with(['boucherie', 'fournisseurUser', 'validePar'])
+            ->latest()
+            ->paginate($perPage);
+    }
+
     public function findOrFail(string $id): Versement
     {
         return $this->model->query()

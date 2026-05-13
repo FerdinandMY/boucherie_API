@@ -14,9 +14,9 @@ class AchatFournisseurService
 {
     public function __construct(private readonly AchatFournisseurRepository $repository) {}
 
-    public function paginate(?string $boucherieId = null, int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, ?string $fournisseurId = null, int $perPage = 15): LengthAwarePaginator
     {
-        return $this->repository->paginate($boucherieId, $perPage);
+        return $this->repository->paginate($boucherieId, $fournisseurId, $perPage);
     }
 
     public function findById(string $id): AchatFournisseur
@@ -24,20 +24,25 @@ class AchatFournisseurService
         return $this->repository->findOrFail($id);
     }
 
-    public function create(array $data, string $boucherieId, int $userId): AchatFournisseur
+    public function create(array $data, ?string $boucherieId, int $userId, ?string $fournisseurId = null): AchatFournisseur
     {
-        return DB::transaction(function () use ($data, $boucherieId, $userId) {
+        return DB::transaction(function () use ($data, $boucherieId, $userId, $fournisseurId) {
             $animaux = $data['animaux'] ?? [];
             unset($data['animaux']);
 
-            $data['boucherie_id'] = $boucherieId;
-            $data['user_id']      = $userId;
+            $data['boucherie_id']  = $boucherieId;
+            $data['fournisseur_id'] = $fournisseurId;
+            $data['user_id']       = $userId;
 
             $achat = $this->repository->create($data);
 
             foreach ($animaux as $animalData) {
                 $animalData['achat_fournisseur_id'] = $achat->id;
-                $animalData['boucherie_id']         = $boucherieId;
+                if ($fournisseurId) {
+                    $animalData['fournisseur_id'] = $fournisseurId;
+                } else {
+                    $animalData['boucherie_id'] = $boucherieId;
+                }
                 Animal::create($animalData);
             }
 

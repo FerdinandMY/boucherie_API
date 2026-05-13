@@ -29,8 +29,11 @@ class AchatFournisseurController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
+        $user          = $request->user();
+        $fournisseurId = $user->hasRole('fournisseur') ? $user->fournisseur?->id : null;
+
         return AchatFournisseurResource::collection(
-            $this->service->paginate($request->user()->boucherie_id)
+            $this->service->paginate($user->boucherie_id, $fournisseurId)
         );
     }
 
@@ -38,16 +41,21 @@ class AchatFournisseurController extends Controller
      * Enregistrer un achat fournisseur
      *
      * Crée l'achat et génère automatiquement les animaux associés.
+     * Pour un fournisseur, les animaux sont liés à son entité fournisseur (pas à une boucherie).
      *
      * @response 201 {"data":{"id":1,"boucherie_id":1,"fournisseur_id":1,"fournisseur":null,"user_id":1,"date_achat":"2024-01-15","montant_total":540000,"notes":"3 bœufs adultes","animaux":[{"id":1,"boucherie_id":1,"achat_fournisseur_id":1,"espece":"bovin","poids_vif_kg":350.5,"prix_achat":180000,"numero_tag":"TAG-2024-001","statut":"en_attente","created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"}],"created_at":"2024-01-15T10:00:00.000Z","updated_at":"2024-01-15T10:00:00.000Z"},"message":"Achat enregistré avec succès."}
      * @response 422 {"message":"The fournisseur_id field is required.","errors":{"fournisseur_id":["The fournisseur_id field is required."]}}
      */
     public function store(StoreAchatFournisseurRequest $request): JsonResponse
     {
+        $user          = $request->user();
+        $fournisseurId = $user->hasRole('fournisseur') ? $user->fournisseur?->id : null;
+
         $achat = $this->service->create(
             $request->validated(),
-            $request->user()->boucherie_id,
-            $request->user()->id
+            $user->boucherie_id,
+            $user->id,
+            $fournisseurId
         );
 
         return response()->json([

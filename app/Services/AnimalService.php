@@ -17,6 +17,11 @@ class AnimalService
         return $this->repository->paginate($boucherieId, $filters, $perPage);
     }
 
+    public function paginateByFournisseurUser(int $userId, array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->repository->paginateByFournisseurUser($userId, $filters, $perPage);
+    }
+
     public function findById(string $id): Animal
     {
         return $this->repository->findOrFail($id);

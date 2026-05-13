@@ -25,6 +25,20 @@ class AnimalRepository
         return $query->paginate($perPage);
     }
 
+    public function paginateByFournisseurUser(int $userId, array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = $this->model->query()
+            ->whereHas('fournisseur', fn ($q) => $q->where('user_id', $userId))
+            ->with(['fournisseur'])
+            ->latest();
+
+        if (!empty($filters['statut'])) {
+            $query->where('statut', $filters['statut']);
+        }
+
+        return $query->paginate($perPage);
+    }
+
     public function findOrFail(string $id): Animal
     {
         return $this->model->query()->with(['fournisseur', 'abattage', 'achatFournisseur'])->findOrFail($id);

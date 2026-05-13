@@ -31,9 +31,14 @@ class AnimalController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        return AnimalResource::collection(
-            $this->service->paginate($request->user()->boucherie_id, $request->only('statut'))
-        );
+        $user    = $request->user();
+        $filters = $request->only('statut');
+
+        $paginator = $user->hasRole('fournisseur')
+            ? $this->service->paginateByFournisseurUser($user->id, $filters)
+            : $this->service->paginate($user->boucherie_id, $filters);
+
+        return AnimalResource::collection($paginator);
     }
 
     /**

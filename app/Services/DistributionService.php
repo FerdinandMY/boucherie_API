@@ -23,6 +23,11 @@ class DistributionService
         return $this->repository->paginateByBoucherie($boucherieId);
     }
 
+    public function paginateAll(): LengthAwarePaginator
+    {
+        return $this->repository->paginateAll();
+    }
+
     public function findById(string $id): Distribution
     {
         return $this->repository->findOrFail($id);

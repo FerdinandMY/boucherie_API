@@ -33,9 +33,11 @@ class DistributionController extends Controller
     {
         $user = $request->user();
 
-        $paginator = $user->hasRole('fournisseur')
-            ? $this->service->paginateByFournisseur($user->id)
-            : $this->service->paginateByBoucherie($user->boucherie_id);
+        $paginator = match (true) {
+            $user->hasRole('fournisseur') => $this->service->paginateByFournisseur($user->id),
+            $user->hasRole('boucher')     => $this->service->paginateByBoucherie((string) $user->boucherie_id),
+            default                       => $this->service->paginateAll(),
+        };
 
         return DistributionResource::collection($paginator);
     }
@@ -64,10 +66,21 @@ class DistributionController extends Controller
      * @response {"data":{"id":"uuid","abattage_id":"uuid","fournisseur_user_id":3,"boucherie_id":"uuid","produit_id":"uuid","quantite":"45.000","statut":"en_attente","notes":null,"reception":null,"created_at":"2024-01-16T08:00:00.000Z","updated_at":"2024-01-16T08:00:00.000Z"}}
      * @response 404 {"message":"Not found."}
      */
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
+        $distribution = $this->service->findById($id);
+        $user         = $request->user();
+
+        if ($user->hasRole('fournisseur') && $distribution->fournisseur_user_id !== $user->id) {
+            abort(403, 'Cette distribution ne vous appartient pas.');
+        }
+
+        if ($user->hasRole('boucher') && $distribution->boucherie_id !== $user->boucherie_id) {
+            abort(403, 'Cette distribution ne concerne pas votre boucherie.');
+        }
+
         return response()->json([
-            'data' => new DistributionResource($this->service->findById($id)),
+            'data' => new DistributionResource($distribution),
         ]);
     }
 

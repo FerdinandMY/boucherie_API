@@ -29,6 +29,14 @@ class DistributionRepository
             ->paginate($perPage);
     }
 
+    public function paginateAll(int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->query()
+            ->with(['abattage', 'boucherie', 'produit', 'fournisseurUser', 'reception'])
+            ->latest()
+            ->paginate($perPage);
+    }
+
     public function findOrFail(string $id): Distribution
     {
         return $this->model->query()

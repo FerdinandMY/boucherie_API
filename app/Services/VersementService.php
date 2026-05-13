@@ -23,6 +23,11 @@ class VersementService
         return $this->repository->paginateByFournisseur($fournisseurUserId);
     }
 
+    public function paginateAll(): LengthAwarePaginator
+    {
+        return $this->repository->paginateAll();
+    }
+
     public function findById(string $id): Versement
     {
         return $this->repository->findOrFail($id);

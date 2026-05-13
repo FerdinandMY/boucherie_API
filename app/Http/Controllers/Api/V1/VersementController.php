@@ -34,9 +34,11 @@ class VersementController extends Controller
     {
         $user = $request->user();
 
-        $paginator = $user->hasRole('fournisseur')
-            ? $this->service->paginateByFournisseur($user->id)
-            : $this->service->paginateByBoucherie($user->boucherie_id);
+        $paginator = match (true) {
+            $user->hasRole('fournisseur') => $this->service->paginateByFournisseur($user->id),
+            $user->hasRole('boucher')     => $this->service->paginateByBoucherie((string) $user->boucherie_id),
+            default                       => $this->service->paginateAll(),
+        };
 
         return VersementResource::collection($paginator);
     }

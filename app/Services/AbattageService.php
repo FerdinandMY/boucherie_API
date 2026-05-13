@@ -21,6 +21,11 @@ class AbattageService
         return $this->repository->paginate($boucherieId, $perPage);
     }
 
+    public function paginateByFournisseurUser(int $userId, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->repository->paginateByFournisseurUser($userId, $perPage);
+    }
+
     public function findById(string $id): Abattage
     {
         return $this->repository->findOrFail($id);
