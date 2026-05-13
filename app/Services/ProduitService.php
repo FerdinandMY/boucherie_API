@@ -12,7 +12,7 @@ class ProduitService
 {
     public function __construct(private readonly ProduitRepository $repository) {}
 
-    public function paginate(string $boucherieId, int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, int $perPage = 15): LengthAwarePaginator
     {
         return $this->repository->paginate($boucherieId, $perPage);
     }

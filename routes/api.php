@@ -57,11 +57,12 @@ Route::prefix('v1')->group(function () {
 
         // ── Admin + Boucher ──────────────────────────────────────────────────
         Route::middleware('role:admin|boucher')->group(function () {
-            Route::apiResource('boucheries', BoucherieController::class);
+            // Écriture boucheries et produits (lecture ouverte au fournisseur plus bas)
+            Route::apiResource('boucheries', BoucherieController::class)->except(['index', 'show']);
+            Route::apiResource('produits',   ProduitController::class)->except(['index', 'show']);
 
             Route::apiResource('fournisseurs', FournisseurController::class);
             Route::apiResource('clients', ClientController::class);
-            Route::apiResource('produits', ProduitController::class);
 
             Route::get('achats-fournisseurs',           [AchatFournisseurController::class, 'index']);
             Route::post('achats-fournisseurs',          [AchatFournisseurController::class, 'store']);
@@ -89,6 +90,12 @@ Route::prefix('v1')->group(function () {
 
         // ── Admin + Boucher + Fournisseur ────────────────────────────────────
         Route::middleware('role:admin|boucher|fournisseur')->group(function () {
+            // Lecture seule boucheries et produits (le fournisseur en a besoin pour distribuer)
+            Route::get('boucheries',             [BoucherieController::class, 'index']);
+            Route::get('boucheries/{boucherie}', [BoucherieController::class, 'show']);
+            Route::get('produits',               [ProduitController::class, 'index']);
+            Route::get('produits/{produit}',     [ProduitController::class, 'show']);
+
             Route::get('abattages',            [AbattageController::class, 'index']);
             Route::post('abattages',           [AbattageController::class, 'store']);
             Route::get('abattages/{abattage}', [AbattageController::class, 'show']);

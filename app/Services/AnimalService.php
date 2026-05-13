@@ -12,7 +12,7 @@ class AnimalService
 {
     public function __construct(private readonly AnimalRepository $repository) {}
 
-    public function paginate(string $boucherieId, array $filters = [], int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return $this->repository->paginate($boucherieId, $filters, $perPage);
     }

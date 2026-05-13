@@ -11,10 +11,10 @@ class StockRepository
 {
     public function __construct(private readonly Stock $model) {}
 
-    public function paginate(string $boucherieId, int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, int $perPage = 15): LengthAwarePaginator
     {
         return $this->model->query()
-            ->where('boucherie_id', $boucherieId)
+            ->when($boucherieId, fn ($q) => $q->where('boucherie_id', $boucherieId))
             ->with(['produit'])
             ->select(['id', 'boucherie_id', 'produit_id', 'abattage_id', 'quantite', 'seuil_alerte', 'updated_at'])
             ->paginate($perPage);

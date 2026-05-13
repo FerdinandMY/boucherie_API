@@ -17,7 +17,7 @@ class VenteService
 {
     public function __construct(private readonly VenteRepository $repository) {}
 
-    public function paginate(string $boucherieId, array $filters = [], int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return $this->repository->paginate($boucherieId, $filters, $perPage);
     }

@@ -11,10 +11,10 @@ class AnimalRepository
 {
     public function __construct(private readonly Animal $model) {}
 
-    public function paginate(string $boucherieId, array $filters = [], int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = $this->model->query()
-            ->where('boucherie_id', $boucherieId)
+            ->when($boucherieId, fn ($q) => $q->where('boucherie_id', $boucherieId))
             ->with(['fournisseur'])
             ->latest();
 

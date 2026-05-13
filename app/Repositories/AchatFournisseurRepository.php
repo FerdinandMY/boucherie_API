@@ -11,10 +11,10 @@ class AchatFournisseurRepository
 {
     public function __construct(private readonly AchatFournisseur $model) {}
 
-    public function paginate(string $boucherieId, int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, int $perPage = 15): LengthAwarePaginator
     {
         return $this->model->query()
-            ->where('boucherie_id', $boucherieId)
+            ->when($boucherieId, fn ($q) => $q->where('boucherie_id', $boucherieId))
             ->with(['fournisseur', 'user'])
             ->select(['id', 'boucherie_id', 'fournisseur_id', 'user_id', 'reference', 'montant_total', 'date_achat', 'created_at', 'updated_at'])
             ->latest()

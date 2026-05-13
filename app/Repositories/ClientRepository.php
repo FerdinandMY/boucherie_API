@@ -11,10 +11,10 @@ class ClientRepository
 {
     public function __construct(private readonly Client $model) {}
 
-    public function paginate(string $boucherieId, int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, int $perPage = 15): LengthAwarePaginator
     {
         return $this->model->query()
-            ->where('boucherie_id', $boucherieId)
+            ->when($boucherieId, fn ($q) => $q->where('boucherie_id', $boucherieId))
             ->select(['id', 'boucherie_id', 'nom', 'telephone', 'adresse', 'created_at', 'updated_at'])
             ->latest()
             ->paginate($perPage);

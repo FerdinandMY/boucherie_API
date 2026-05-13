@@ -11,10 +11,10 @@ class VenteRepository
 {
     public function __construct(private readonly Vente $model) {}
 
-    public function paginate(string $boucherieId, array $filters = [], int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $boucherieId = null, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = $this->model->query()
-            ->where('boucherie_id', $boucherieId)
+            ->when($boucherieId, fn ($q) => $q->where('boucherie_id', $boucherieId))
             ->with(['client', 'user'])
             ->select(['id', 'boucherie_id', 'client_id', 'user_id', 'type_vente', 'statut', 'montant_total', 'created_at', 'updated_at']);
 
