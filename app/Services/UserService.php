@@ -40,11 +40,11 @@ class UserService
             $user = User::create($data);
             $user->assignRole($role);
 
-            if ($role === 'fournisseur' && $fournisseurData) {
+            if ($role === 'fournisseur') {
                 Fournisseur::create([
                     'user_id'      => $user->id,
                     'boucherie_id' => null,
-                    'nom'          => $fournisseurData['nom'],
+                    'nom'          => $fournisseurData['nom']       ?? $user->name,
                     'contact'      => $fournisseurData['contact']   ?? null,
                     'telephone'    => $fournisseurData['telephone']  ?? null,
                     'email'        => $fournisseurData['email']      ?? $user->email,
