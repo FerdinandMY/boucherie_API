@@ -14,6 +14,10 @@
             --boucher-light: #fef2f2;
             --fourn:       #16a34a;
             --fourn-light: #f0fdf4;
+            --v2:          #0891b2;
+            --v2-light:    #ecfeff;
+            --v1:          #92400e;
+            --v1-light:    #fffbeb;
             --gray:        #64748b;
             --border:      #e2e8f0;
             --bg:          #f8fafc;
@@ -84,7 +88,35 @@
         .badge-admin   { background: var(--admin);   color: #fff; }
         .badge-boucher { background: var(--boucher); color: #fff; }
         .badge-fourn   { background: var(--fourn);   color: #fff; }
+        .badge-v2      { background: var(--v2);      color: #fff; }
         .section-title { font-size: 1.4rem; font-weight: 700; }
+
+        /* ── VERSION TAGS ── */
+        .vtag {
+            display: inline-flex; align-items: center;
+            padding: .1rem .45rem;
+            border-radius: 4px;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            vertical-align: middle;
+            margin-left: .35rem;
+        }
+        .vtag-v1 { background: var(--v1-light); border: 1px solid var(--v1); color: var(--v1); }
+        .vtag-v2 { background: var(--v2-light); border: 1px solid var(--v2); color: var(--v2); }
+
+        /* ── V2 HIGHLIGHT BOX ── */
+        .v2-box {
+            background: var(--v2-light);
+            border: 1px solid var(--v2);
+            border-left: 4px solid var(--v2);
+            border-radius: 8px;
+            padding: .75rem 1rem;
+            margin-top: .75rem;
+            font-size: .88rem;
+        }
+        .v2-box strong { color: var(--v2); }
 
         /* ── FLOW ── */
         .flow { display: flex; flex-direction: column; gap: .5rem; }
@@ -224,6 +256,13 @@
 <header>
     <h1>🥩 Guide d'utilisation — Boucherie API</h1>
     <p>Flux d'utilisation du système par rôle</p>
+    <p style="margin-top:.6rem;font-size:.88rem;color:#64748b;">
+        <span style="background:#0891b2;color:#fff;padding:.15rem .5rem;border-radius:4px;font-weight:700;font-size:.78rem;">v2</span>
+        &nbsp;Nouveau flux catégorie (abattage_lignes · distribution_lignes · recettes_journalieres)
+        &nbsp;&nbsp;
+        <span style="background:#92400e;color:#fff;padding:.15rem .5rem;border-radius:4px;font-weight:700;font-size:.78rem;">v1</span>
+        &nbsp;Flux produits/ventes maintenu en parallèle
+    </p>
 </header>
 
 <nav class="pills">
@@ -232,6 +271,7 @@
     <a class="pill pill-boucher" href="#boucher">Boucher</a>
     <a class="pill pill-fourn"   href="#fournisseur">Fournisseur</a>
     <a class="pill pill-global"  href="#stats">Statistiques</a>
+    <a class="pill" style="background:var(--v2-light);color:var(--v2);border:2px solid var(--v2);" href="#v2">Nouveautés v2</a>
     <a class="pill pill-global"  href="#comptes">Comptes de test</a>
 </nav>
 
@@ -266,11 +306,10 @@
                 <div class="gf-header boucher">Boucher</div>
                 <div class="gf-body">
                     <ol>
-                        <li>Réceptionne les lots (stock auto-alimenté)</li>
-                        <li>Gère le stock</li>
-                        <li>Crée les ventes</li>
-                        <li>Encaisse les paiements clients</li>
-                        <li>Effectue les versements au fournisseur</li>
+                        <li>Réceptionne les lots</li>
+                        <li><span class="vtag vtag-v1">v1</span> Crée les ventes produit par produit</li>
+                        <li><span class="vtag vtag-v2">v2</span> Enregistre la recette du jour (ventes + versement en un seul acte)</li>
+                        <li>Suit le stock (unités v1 · kg par catégorie v2)</li>
                     </ol>
                 </div>
             </div>
@@ -447,11 +486,36 @@
                 <div class="step-num num-boucher">3</div>
                 <div class="step-body">
                     <h3>Réceptionner un lot</h3>
-                    <p>Le boucher confirme la réception d'un lot distribué par le fournisseur. <strong>Le stock est automatiquement alimenté</strong> et un mouvement d'entrée est enregistré.</p>
+                    <p>Le boucher confirme la réception d'un lot distribué par le fournisseur. <strong>Le stock est automatiquement alimenté.</strong></p>
                     <span class="endpoint"><span class="method post">POST</span>/api/v1/receptions</span>
-                    <br><span style="font-size:.82rem;color:#64748b;margin-top:.3rem;display:block">
-                        Corps : { distribution_id, quantite_recue, date_reception }
-                    </span>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem;">
+                        <div style="background:var(--v1-light);border:1px solid #fcd34d;border-radius:8px;padding:.75rem;">
+                            <div style="font-weight:700;font-size:.78rem;color:var(--v1);margin-bottom:.4rem;">v1 — quantité globale</div>
+                            <pre style="font-size:.75rem;color:#334155;white-space:pre-wrap;margin:0;">{
+  "distribution_id": "&lt;uuid&gt;",
+  "quantite_recue": 50,
+  "date_reception": "2026-05-16"
+}</pre>
+                        </div>
+                        <div style="background:var(--v2-light);border:1px solid var(--v2);border-radius:8px;padding:.75rem;">
+                            <div style="font-weight:700;font-size:.78rem;color:var(--v2);margin-bottom:.4rem;">v2 — lignes par catégorie</div>
+                            <pre style="font-size:.75rem;color:#334155;white-space:pre-wrap;margin:0;">{
+  "distribution_id": "&lt;uuid&gt;",
+  "quantite_recue": 115,
+  "date_reception": "2026-05-16",
+  "lignes": [
+    { "categorie": "viande_rouge",
+      "poids_kg_attendu": 100,
+      "poids_kg_recu": 98 },
+    { "categorie": "abats",
+      "poids_kg_attendu": 15,
+      "poids_kg_recu": 15 }
+  ]
+}</pre>
+                            <p style="margin-top:.4rem;font-size:.78rem;color:#0e7490;">→ Met à jour <code>stocks_categories</code> automatiquement.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="arrow"></div>
@@ -483,8 +547,8 @@
             <div class="step">
                 <div class="step-num num-boucher">6</div>
                 <div class="step-body">
-                    <h3>Créer une vente</h3>
-                    <p>Enregistre une vente avec les lignes de produits. <strong>Le stock est automatiquement décrémenté.</strong></p>
+                    <h3>Enregistrer les ventes <span class="vtag vtag-v1">v1</span></h3>
+                    <p>Enregistre une vente produit par produit avec les lignes détaillées. <strong>Le stock (unités) est automatiquement décrémenté.</strong></p>
                     <span class="endpoint"><span class="method post">POST</span>/api/v1/ventes</span>
                     <br><span style="font-size:.82rem;color:#64748b;margin-top:.3rem;display:block">
                         Corps : { client_id, type_vente, lignes: [{ produit_id, quantite, prix_unitaire }] }
@@ -494,9 +558,36 @@
             <div class="arrow"></div>
 
             <div class="step">
+                <div class="step-num num-boucher" style="background:var(--v2);color:#fff;">6</div>
+                <div class="step-body" style="border-color:var(--v2);">
+                    <h3>Enregistrer la recette journalière + versement <span class="vtag vtag-v2">v2</span></h3>
+                    <p>En <strong>un seul formulaire</strong>, le boucher déclare la somme des ventes du jour par catégorie et le montant versé au fournisseur. <strong>Le stock (kg) est automatiquement décrémenté.</strong></p>
+                    <span class="endpoint"><span class="method post">POST</span>/api/v1/recettes</span>
+                    <div class="v2-box" style="margin-top:.6rem;">
+<pre style="font-size:.75rem;color:#334155;white-space:pre-wrap;margin:0;">{
+  "date": "2026-05-16",
+  "montant_verse": 100000,
+  "fournisseur_id": "&lt;uuid&gt;",
+  "notes": "Bonne journée",
+  "lignes": [
+    { "categorie": "viande_rouge", "poids_kg_vendu": 50, "prix_par_kg": 2500 },
+    { "categorie": "abats",        "poids_kg_vendu": 10, "prix_par_kg": 1000 }
+  ]
+}</pre>
+                        <p style="margin-top:.5rem;font-size:.82rem;color:#0e7490;">
+                            → <code>montant_total</code> calculé automatiquement (Σ poids × prix).<br>
+                            → Stock physique (kg) décrémenté dans <code>stocks_categories</code>.<br>
+                            → Versement en statut <strong>en_attente</strong> jusqu'à validation du fournisseur.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="arrow"></div>
+
+            <div class="step">
                 <div class="step-num num-boucher">7</div>
                 <div class="step-body">
-                    <h3>Enregistrer le paiement client</h3>
+                    <h3>Enregistrer le paiement client <span class="vtag vtag-v1">v1</span></h3>
                     <p>Enregistre le règlement du client pour une vente donnée (espèces, mobile money…).</p>
                     <span class="endpoint"><span class="method post">POST</span>/api/v1/ventes/{id}/paiements</span>
                 </div>
@@ -506,7 +597,7 @@
             <div class="step">
                 <div class="step-num num-boucher">8</div>
                 <div class="step-body">
-                    <h3>Effectuer un versement au fournisseur</h3>
+                    <h3>Effectuer un versement au fournisseur <span class="vtag vtag-v1">v1</span></h3>
                     <p>Déclare un paiement effectué au fournisseur. Le versement passe en statut <strong>en_attente</strong> jusqu'à validation du fournisseur.</p>
                     <span class="endpoint"><span class="method post">POST</span>/api/v1/versements</span>
                     <br><span style="font-size:.82rem;color:#64748b;margin-top:.3rem;display:block">
@@ -570,9 +661,33 @@
                     <h3>Effectuer un abattage</h3>
                     <p>Enregistre l'abattage d'un animal. Le poids de carcasse et le rendement sont calculés. <strong>Aucun stock n'est créé à cette étape</strong> — le stock sera alimenté à la réception par la boucherie.</p>
                     <span class="endpoint"><span class="method post">POST</span>/api/v1/abattages</span>
-                    <br><span style="font-size:.82rem;color:#64748b;margin-top:.3rem;display:block">
-                        Corps : { animal_id, date_abattage, poids_carcasse_kg, notes? }
-                    </span>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem;">
+                        <div style="background:var(--v1-light);border:1px solid #fcd34d;border-radius:8px;padding:.75rem;">
+                            <div style="font-weight:700;font-size:.78rem;color:var(--v1);margin-bottom:.4rem;">v1 — sans lignes</div>
+                            <pre style="font-size:.75rem;color:#334155;white-space:pre-wrap;margin:0;">{
+  "animal_id": "&lt;uuid&gt;",
+  "date_abattage": "2026-05-16",
+  "poids_carcasse_kg": 180,
+  "stocks": [
+    { "produit_id": "&lt;uuid&gt;", "quantite": 50 }
+  ]
+}</pre>
+                        </div>
+                        <div style="background:var(--v2-light);border:1px solid var(--v2);border-radius:8px;padding:.75rem;">
+                            <div style="font-weight:700;font-size:.78rem;color:var(--v2);margin-bottom:.4rem;">v2 — lignes par catégorie</div>
+                            <pre style="font-size:.75rem;color:#334155;white-space:pre-wrap;margin:0;">{
+  "animal_id": "&lt;uuid&gt;",
+  "date_abattage": "2026-05-16",
+  "poids_carcasse_kg": 180,
+  "lignes": [
+    { "categorie": "viande_rouge", "poids_kg": 150 },
+    { "categorie": "abats",        "poids_kg": 20 },
+    { "categorie": "autre",        "poids_kg": 10 }
+  ]
+}</pre>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="arrow"></div>
@@ -581,11 +696,36 @@
                 <div class="step-num num-fourn">4</div>
                 <div class="step-body">
                     <h3>Distribuer les lots aux boucheries</h3>
-                    <p>Depuis un abattage, le fournisseur crée des distributions vers une ou plusieurs boucheries en précisant le produit (type de coupe) et la quantité allouée.</p>
+                    <p>Distribution individuelle : <strong>une distribution par boucherie</strong>. Le fournisseur alloue une portion de l'abattage à chaque boucherie.</p>
                     <span class="endpoint"><span class="method post">POST</span>/api/v1/distributions</span>
-                    <br><span style="font-size:.82rem;color:#64748b;margin-top:.3rem;display:block">
-                        Corps : { abattage_id, boucherie_id, produit_id, quantite, notes? }
-                    </span>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem;">
+                        <div style="background:var(--v1-light);border:1px solid #fcd34d;border-radius:8px;padding:.75rem;">
+                            <div style="font-weight:700;font-size:.78rem;color:var(--v1);margin-bottom:.4rem;">v1 — par produit</div>
+                            <pre style="font-size:.75rem;color:#334155;white-space:pre-wrap;margin:0;">{
+  "abattage_id": "&lt;uuid&gt;",
+  "boucherie_id": "&lt;uuid&gt;",
+  "produit_id": "&lt;uuid&gt;",
+  "quantite": 50,
+  "notes": "..."
+}</pre>
+                        </div>
+                        <div style="background:var(--v2-light);border:1px solid var(--v2);border-radius:8px;padding:.75rem;">
+                            <div style="font-weight:700;font-size:.78rem;color:var(--v2);margin-bottom:.4rem;">v2 — lignes par catégorie</div>
+                            <pre style="font-size:.75rem;color:#334155;white-space:pre-wrap;margin:0;">{
+  "abattage_id": "&lt;uuid&gt;",
+  "boucherie_id": "&lt;uuid&gt;",
+  "lignes": [
+    { "categorie": "viande_rouge",
+      "poids_kg": 100,
+      "prix_par_kg": 2500 },
+    { "categorie": "abats",
+      "poids_kg": 15,
+      "prix_par_kg": 1000 }
+  ]
+}</pre>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="arrow"></div>
@@ -763,6 +903,124 @@
             <strong>Exemple de requête :</strong><br>
             <code>GET /api/v1/stats?periode=semaine</code><br>
             <code>Authorization: Bearer &lt;token&gt;</code>
+        </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════
+         NOUVEAUTÉS V2
+    ══════════════════════════════════════════ -->
+    <section class="section" id="v2">
+        <div class="section-header">
+            <span class="badge badge-v2">🆕 v2</span>
+            <h2 class="section-title">Nouveautés v2 — Flux par catégorie</h2>
+        </div>
+
+        <div class="info-box" style="border-left-color:var(--v2);margin-bottom:1.5rem;">
+            <strong>Principe :</strong> Le v2 introduit un flux basé sur les <strong>catégories de viande</strong> (viande_rouge, abats, volaille…) plutôt que sur des produits spécifiques. Les deux flux coexistent — aucune donnée v1 n'est supprimée.
+        </div>
+
+        <!-- NOUVELLES TABLES -->
+        <div style="margin-bottom:2rem;">
+            <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem;color:var(--v2);">Nouvelles tables</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;">
+                <div class="step-body">
+                    <h3><code>abattage_lignes</code></h3>
+                    <p>Décompose chaque abattage par catégorie. Renseigner <code>lignes</code> dans le corps de <code>POST /abattages</code>.</p>
+                </div>
+                <div class="step-body">
+                    <h3><code>distribution_lignes</code></h3>
+                    <p>Quantités distribuées par catégorie vers une boucherie. Renseigner <code>lignes</code> dans <code>POST /distributions</code>.</p>
+                </div>
+                <div class="step-body">
+                    <h3><code>reception_lignes</code></h3>
+                    <p>Détail de la réception par catégorie. Renseigner <code>lignes</code> dans <code>POST /receptions</code>.</p>
+                </div>
+                <div class="step-body">
+                    <h3><code>stocks_categories</code></h3>
+                    <p>Stock physique en kg par catégorie et par boucherie. Alimenté automatiquement à la réception, décrémenté à la recette journalière.</p>
+                </div>
+                <div class="step-body">
+                    <h3><code>recettes_journalieres</code></h3>
+                    <p>Récapitulatif journalier : total des ventes + versement au fournisseur en un seul enregistrement.</p>
+                </div>
+                <div class="step-body">
+                    <h3><code>recette_lignes</code></h3>
+                    <p>Détail de la recette par catégorie : kg vendus, prix/kg, montant. Permet le suivi physique et financier.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOUVEAUX ENDPOINTS -->
+        <div style="margin-bottom:2rem;">
+            <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem;color:var(--v2);">Nouveaux endpoints — Recettes journalières</h3>
+            <table class="cred-table">
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Route</th>
+                        <th>Rôles</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get" style="font-weight:700;">GET</span></td>
+                        <td><code>/api/v1/recettes</code></td>
+                        <td>admin · boucher · fournisseur</td>
+                        <td>Liste des recettes (filtrée par rôle)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post" style="font-weight:700;">POST</span></td>
+                        <td><code>/api/v1/recettes</code></td>
+                        <td>boucher · admin</td>
+                        <td>Enregistrer la recette du jour + versement</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get" style="font-weight:700;">GET</span></td>
+                        <td><code>/api/v1/recettes/{id}</code></td>
+                        <td>admin · boucher · fournisseur</td>
+                        <td>Détail d'une recette</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method patch" style="font-weight:700;">PATCH</span></td>
+                        <td><code>/api/v1/recettes/{id}/valider</code></td>
+                        <td>fournisseur · admin</td>
+                        <td>Valider le versement déclaré</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method patch" style="font-weight:700;">PATCH</span></td>
+                        <td><code>/api/v1/recettes/{id}/rejeter</code></td>
+                        <td>fournisseur · admin</td>
+                        <td>Rejeter le versement (montant incorrect…)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- DEUX SUIVIS -->
+        <div>
+            <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:1rem;color:var(--v2);">Double suivi automatique</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+                <div class="step-body" style="border-left:4px solid var(--v2);">
+                    <h3>📦 Suivi physique (kg)</h3>
+                    <p>Le champ <code>poids_kg_disponible</code> dans <code>stocks_categories</code> est mis à jour automatiquement :</p>
+                    <ul style="margin-top:.5rem;padding-left:1.2rem;font-size:.88rem;color:#475569;">
+                        <li><strong>+</strong> à la réception d'une distribution (lignes)</li>
+                        <li><strong>−</strong> à l'enregistrement d'une recette journalière</li>
+                    </ul>
+                </div>
+                <div class="step-body" style="border-left:4px solid var(--v2);">
+                    <h3>💰 Suivi financier</h3>
+                    <p>Par recette journalière :</p>
+                    <ul style="margin-top:.5rem;padding-left:1.2rem;font-size:.88rem;color:#475569;">
+                        <li><code>montant_total</code> = Σ (kg vendus × prix/kg)</li>
+                        <li><code>montant_verse</code> = ce que la boucherie reverse</li>
+                        <li>Différence = trésorerie retenue</li>
+                        <li>Statut : <strong>en_attente → valide / rejete</strong></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </section>
 

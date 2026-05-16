@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Abattage;
+use App\Models\AbattageLigne;
 use App\Models\MouvementStock;
 use App\Models\Stock;
 use App\Repositories\AbattageRepository;
@@ -50,6 +51,8 @@ class AbattageService
             }
 
             $data['user_id'] = $userId;
+            $lignes          = $data['lignes'] ?? [];
+            unset($data['lignes']);
 
             // Flux fournisseur : boucherie_id reste null, le stock sera alimenté à la réception
             // Flux boucherie   : boucherie_id provient de l'animal
@@ -82,7 +85,16 @@ class AbattageService
                 }
             }
 
-            return $abattage->fresh(['animal', 'stocks.produit', 'distributions']);
+            // v2 — lignes par catégorie (optionnel, fournisseur flow)
+            foreach ($lignes as $ligne) {
+                AbattageLigne::create([
+                    'abattage_id' => $abattage->id,
+                    'categorie'   => $ligne['categorie'],
+                    'poids_kg'    => $ligne['poids_kg'],
+                ]);
+            }
+
+            return $abattage->fresh(['animal', 'stocks.produit', 'distributions', 'lignes']);
         });
     }
 }

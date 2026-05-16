@@ -46,4 +46,9 @@ class Distribution extends Model
     {
         return $this->hasOne(Reception::class, 'distribution_id');
     }
+
+    public function lignes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(DistributionLigne::class, 'distribution_id');
+    }
 }

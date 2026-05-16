@@ -6,7 +6,9 @@ namespace App\Services;
 
 use App\Models\MouvementStock;
 use App\Models\Reception;
+use App\Models\ReceptionLigne;
 use App\Models\Stock;
+use App\Models\StockCategorie;
 use App\Repositories\DistributionRepository;
 use App\Repositories\ReceptionRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -38,6 +40,7 @@ class ReceptionService
     public function create(array $data, ?string $boucherieId, int $userId): Reception
     {
         return DB::transaction(function () use ($data, $boucherieId, $userId) {
+            $lignes       = $data['lignes'] ?? [];
             $distribution = $this->distributionRepository->findOrFail($data['distribution_id']);
 
             if ($distribution->boucherie_id !== $boucherieId) {
@@ -80,7 +83,23 @@ class ReceptionService
                 'motif'    => "Réception distribution #{$distribution->id}",
             ]);
 
-            return $reception->fresh(['distribution.produit', 'distribution.fournisseurUser']);
+            // v2 — lignes par catégorie + mise à jour stocks_categories
+            foreach ($lignes as $ligne) {
+                ReceptionLigne::create([
+                    'reception_id'     => $reception->id,
+                    'categorie'        => $ligne['categorie'],
+                    'poids_kg_attendu' => $ligne['poids_kg_attendu'] ?? null,
+                    'poids_kg_recu'    => $ligne['poids_kg_recu'],
+                ]);
+
+                $stockCat = StockCategorie::firstOrCreate(
+                    ['boucherie_id' => $boucherieId, 'categorie' => $ligne['categorie']],
+                    ['poids_kg_disponible' => 0]
+                );
+                $stockCat->increment('poids_kg_disponible', (float) $ligne['poids_kg_recu']);
+            }
+
+            return $reception->fresh(['distribution.produit', 'distribution.fournisseurUser', 'lignes']);
         });
     }
 }

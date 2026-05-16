@@ -9,37 +9,33 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Reception extends Model
+class RecetteJournaliere extends Model
 {
     use HasUuids;
 
     protected $fillable = [
-        'distribution_id', 'boucherie_id', 'user_id',
-        'quantite_recue', 'date_reception', 'notes',
+        'boucherie_id', 'fournisseur_id', 'date',
+        'montant_total', 'montant_verse', 'statut_versement', 'notes',
     ];
 
     protected $casts = [
-        'quantite_recue' => 'decimal:3',
-        'date_reception' => 'date',
+        'date'          => 'date',
+        'montant_total' => 'decimal:2',
+        'montant_verse' => 'decimal:2',
     ];
-
-    public function distribution(): BelongsTo
-    {
-        return $this->belongsTo(Distribution::class, 'distribution_id');
-    }
 
     public function boucherie(): BelongsTo
     {
         return $this->belongsTo(Boucherie::class, 'boucherie_id');
     }
 
-    public function user(): BelongsTo
+    public function fournisseur(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Fournisseur::class, 'fournisseur_id');
     }
 
     public function lignes(): HasMany
     {
-        return $this->hasMany(ReceptionLigne::class, 'reception_id');
+        return $this->hasMany(RecetteLigne::class, 'recette_id');
     }
 }

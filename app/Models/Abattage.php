@@ -49,4 +49,9 @@ class Abattage extends Model
     {
         return $this->hasMany(Stock::class, 'abattage_id');
     }
+
+    public function lignes(): HasMany
+    {
+        return $this->hasMany(AbattageLigne::class, 'abattage_id');
+    }
 }

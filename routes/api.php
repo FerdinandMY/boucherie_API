@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\ReceptionController;
 use App\Http\Controllers\Api\V1\StatsController;
 use App\Http\Controllers\Api\V1\StockController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\RecetteJournaliereController;
 use App\Http\Controllers\Api\V1\VenteController;
 use App\Http\Controllers\Api\V1\VersementController;
 use Illuminate\Support\Facades\Route;
@@ -132,6 +133,21 @@ Route::prefix('v1')->group(function () {
         Route::middleware('role:boucher|admin')->group(function () {
             Route::post('receptions',  [ReceptionController::class, 'store']);
             Route::post('versements',  [VersementController::class, 'store']);
+        });
+
+        // ── Recettes journalières v2 ──────────────────────────────────────────
+        Route::middleware('role:admin|boucher|fournisseur')->group(function () {
+            Route::get('recettes',            [RecetteJournaliereController::class, 'index']);
+            Route::get('recettes/{recette}',  [RecetteJournaliereController::class, 'show']);
+        });
+
+        Route::middleware('role:boucher|admin')->group(function () {
+            Route::post('recettes', [RecetteJournaliereController::class, 'store']);
+        });
+
+        Route::middleware('role:fournisseur|admin')->group(function () {
+            Route::patch('recettes/{recette}/valider', [RecetteJournaliereController::class, 'valider']);
+            Route::patch('recettes/{recette}/rejeter', [RecetteJournaliereController::class, 'rejeter']);
         });
     });
 });
