@@ -18,6 +18,3 @@ php artisan migrate --force
 echo "[deploy] Seeding reference data..."
 php artisan db:seed --class=RoleSeeder --force
 php artisan db:seed --class=EnumValeurSeeder --force
-
-echo "[deploy] Correction des entités fournisseur manquantes..."
-php artisan fournisseurs:fix-entites --no-interaction

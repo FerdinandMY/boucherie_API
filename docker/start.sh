@@ -21,5 +21,8 @@ echo "[deploy] Seeding reference data..."
 php artisan db:seed --class=RoleSeeder --force
 php artisan db:seed --class=EnumValeurSeeder --force
 
+echo "[deploy] Correction des entités fournisseur manquantes..."
+php artisan fournisseurs:fix-entites
+
 echo "[deploy] Starting nginx + php-fpm..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

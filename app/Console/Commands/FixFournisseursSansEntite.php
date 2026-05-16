@@ -32,14 +32,6 @@ class FixFournisseursSansEntite extends Command
             return self::SUCCESS;
         }
 
-        // En mode non-interactif (CI/CD), on applique directement sans confirmation
-        $proceed = ! $this->input->isInteractive()
-            || $this->confirm('Créer les entités manquantes ?', true);
-
-        if (! $proceed) {
-            return self::SUCCESS;
-        }
-
         $created = 0;
         foreach ($fournisseurs as $user) {
             Fournisseur::create([
