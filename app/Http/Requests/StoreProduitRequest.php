@@ -16,12 +16,15 @@ class StoreProduitRequest extends FormRequest
 
     public function rules(): array
     {
+        $isAdmin = $this->user()?->hasRole('admin');
+
         return [
             'nom'           => ['required', 'string', 'max:255'],
             'categorie'     => ['required', 'string', Rule::exists('enum_valeurs', 'valeur')->where('type', 'categorie_produit')],
             'unite'         => ['required', 'string', Rule::exists('enum_valeurs', 'valeur')->where('type', 'unite_produit')],
             'prix_unitaire' => ['required', 'numeric', 'min:0'],
             'description'   => ['nullable', 'string'],
+            'boucherie_id'  => [Rule::requiredIf($isAdmin), 'nullable', 'uuid', 'exists:boucheries,id'],
         ];
     }
 }

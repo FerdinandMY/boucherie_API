@@ -22,7 +22,7 @@ class ProduitService
         return $this->repository->findOrFail($id);
     }
 
-    public function create(array $data, string $boucherieId): Produit
+    public function create(array $data, ?string $boucherieId): Produit
     {
         return $this->repository->create(array_merge($data, ['boucherie_id' => $boucherieId]));
     }

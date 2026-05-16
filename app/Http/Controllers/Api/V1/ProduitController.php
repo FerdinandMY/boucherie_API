@@ -29,8 +29,16 @@ class ProduitController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
+        $user = $request->user();
+
+        $boucherieId = match (true) {
+            $user->hasRole('admin')       => null,
+            $user->hasRole('fournisseur') => null,
+            default                       => $user->boucherie_id,
+        };
+
         return ProduitResource::collection(
-            $this->service->paginate($request->user()->boucherie_id)
+            $this->service->paginate($boucherieId)
         );
     }
 
@@ -42,9 +50,14 @@ class ProduitController extends Controller
      */
     public function store(StoreProduitRequest $request): JsonResponse
     {
+        $user        = $request->user();
+        $boucherieId = $user->hasRole('admin')
+            ? $request->validated('boucherie_id')
+            : $user->boucherie_id;
+
         $produit = $this->service->create(
-            $request->validated(),
-            $request->user()->boucherie_id
+            $request->safe()->except('boucherie_id'),
+            $boucherieId
         );
 
         return response()->json([
