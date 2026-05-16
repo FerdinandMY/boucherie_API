@@ -20,9 +20,14 @@ class ReceptionService
         private readonly DistributionRepository $distributionRepository,
     ) {}
 
-    public function paginateByBoucherie(string $boucherieId): LengthAwarePaginator
+    public function paginateByBoucherie(?string $boucherieId = null): LengthAwarePaginator
     {
         return $this->repository->paginateByBoucherie($boucherieId);
+    }
+
+    public function paginateByFournisseur(int $fournisseurUserId): LengthAwarePaginator
+    {
+        return $this->repository->paginateByFournisseur($fournisseurUserId);
     }
 
     public function findById(string $id): Reception
@@ -30,7 +35,7 @@ class ReceptionService
         return $this->repository->findOrFail($id);
     }
 
-    public function create(array $data, string $boucherieId, int $userId): Reception
+    public function create(array $data, ?string $boucherieId, int $userId): Reception
     {
         return DB::transaction(function () use ($data, $boucherieId, $userId) {
             $distribution = $this->distributionRepository->findOrFail($data['distribution_id']);

@@ -33,7 +33,7 @@ class VersementService
         return $this->repository->findOrFail($id);
     }
 
-    public function create(array $data, string $boucherieId): Versement
+    public function create(array $data, ?string $boucherieId): Versement
     {
         $data['boucherie_id'] = $boucherieId;
         $data['statut']       = 'en_attente';

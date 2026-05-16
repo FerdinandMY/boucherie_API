@@ -29,9 +29,15 @@ class ReceptionController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        return ReceptionResource::collection(
-            $this->service->paginateByBoucherie($request->user()->boucherie_id)
-        );
+        $user = $request->user();
+
+        $paginator = match (true) {
+            $user->hasRole('fournisseur') => $this->service->paginateByFournisseur($user->id),
+            $user->hasRole('boucher')     => $this->service->paginateByBoucherie($user->boucherie_id),
+            default                       => $this->service->paginateByBoucherie(), // admin : toutes
+        };
+
+        return ReceptionResource::collection($paginator);
     }
 
     /**
@@ -64,10 +70,21 @@ class ReceptionController extends Controller
      * @response {"data":{"id":"uuid","distribution_id":"uuid","boucherie_id":"uuid","user_id":2,"quantite_recue":"45.000","date_reception":"2024-01-16","notes":null,"created_at":"2024-01-16T09:00:00.000Z"}}
      * @response 404 {"message":"Not found."}
      */
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
+        $reception = $this->service->findById($id);
+        $user      = $request->user();
+
+        if ($user->hasRole('boucher') && $reception->boucherie_id !== $user->boucherie_id) {
+            abort(403, 'Cette réception ne concerne pas votre boucherie.');
+        }
+
+        if ($user->hasRole('fournisseur') && $reception->distribution?->fournisseur_user_id !== $user->id) {
+            abort(403, 'Cette réception ne concerne pas vos distributions.');
+        }
+
         return response()->json([
-            'data' => new ReceptionResource($this->service->findById($id)),
+            'data' => new ReceptionResource($reception),
         ]);
     }
 }

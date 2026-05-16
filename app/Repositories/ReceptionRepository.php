@@ -11,10 +11,19 @@ class ReceptionRepository
 {
     public function __construct(private readonly Reception $model) {}
 
-    public function paginateByBoucherie(string $boucherieId, int $perPage = 15): LengthAwarePaginator
+    public function paginateByBoucherie(?string $boucherieId = null, int $perPage = 15): LengthAwarePaginator
     {
         return $this->model->query()
-            ->where('boucherie_id', $boucherieId)
+            ->when($boucherieId, fn ($q) => $q->where('boucherie_id', $boucherieId))
+            ->with(['distribution.produit', 'distribution.fournisseurUser', 'user'])
+            ->latest()
+            ->paginate($perPage);
+    }
+
+    public function paginateByFournisseur(int $fournisseurUserId, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->query()
+            ->whereHas('distribution', fn ($q) => $q->where('fournisseur_user_id', $fournisseurUserId))
             ->with(['distribution.produit', 'distribution.fournisseurUser', 'user'])
             ->latest()
             ->paginate($perPage);

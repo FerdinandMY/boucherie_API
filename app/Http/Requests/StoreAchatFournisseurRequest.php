@@ -16,8 +16,16 @@ class StoreAchatFournisseurRequest extends FormRequest
 
     public function rules(): array
     {
+        $isFournisseur = $this->user()?->hasRole('fournisseur');
+
         return [
-            'fournisseur_id'           => ['required', 'uuid', 'exists:fournisseurs,id'],
+            // Obligatoire seulement pour boucher/admin ; le fournisseur est résolu depuis son profil
+            'fournisseur_id' => [
+                Rule::requiredIf(! $isFournisseur),
+                'nullable',
+                'uuid',
+                'exists:fournisseurs,id',
+            ],
             'date_achat'               => ['required', 'date'],
             'montant_total'            => ['required', 'numeric', 'min:0'],
             'notes'                    => ['nullable', 'string'],
