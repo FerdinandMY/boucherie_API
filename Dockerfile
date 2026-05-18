@@ -35,7 +35,40 @@ RUN php artisan package:discover --ansi \
     && rm .env
 
 
-# ── Stage 2 : image de production ────────────────────────────────────────────
+# ── Stage 2 : tests (bloque le déploiement si un test échoue) ────────────────
+FROM php:8.4-fpm-bullseye AS tester
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev libzip-dev libsqlite3-dev zip unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN docker-php-ext-install pdo pdo_pgsql pdo_sqlite zip bcmath
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+COPY . .
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Installer toutes les dépendances (dont Pest/factories en dev)
+RUN composer install --no-scripts --no-interaction --no-progress
+
+# Environnement de test minimal avec SQLite en mémoire
+RUN printf "APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n\
+APP_ENV=testing\n\
+DB_CONNECTION=sqlite\n\
+DB_DATABASE=:memory:\n\
+LOG_CHANNEL=stderr\n" > .env
+
+RUN php artisan package:discover --ansi
+
+# Lancement des tests — le build échoue ici si un test est rouge
+RUN vendor/bin/pest --no-coverage
+
+
+# ── Stage 3 : image de production ────────────────────────────────────────────
 FROM php:8.4-fpm-bullseye
 
 # Dépendances système
@@ -73,6 +106,10 @@ COPY . .
 COPY --from=docs-builder /var/www/html/public/docs public/docs
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Porte de sécurité : ce COPY échoue si le stage tester a échoué (tests rouges)
+COPY --from=tester /var/www/html/vendor/autoload.php /tmp/.test-gate
+RUN rm /tmp/.test-gate
 
 # Installer uniquement les dépendances de production
 RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --no-progress
