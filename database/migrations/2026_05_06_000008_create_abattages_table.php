@@ -14,7 +14,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('animal_id')->constrained('animaux')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignUuid('boucherie_id')->constrained('boucheries')->cascadeOnDelete();
+            $table->foreignUuid('boucherie_id')->nullable()->constrained('boucheries')->nullOnDelete();
             $table->date('date_abattage');
             $table->decimal('poids_carcasse_kg', 8, 2);
             $table->decimal('rendement_pct', 5, 2)->nullable();

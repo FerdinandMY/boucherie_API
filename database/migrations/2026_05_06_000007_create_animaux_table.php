@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('animaux', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('boucherie_id')->constrained('boucheries')->cascadeOnDelete();
+            $table->foreignUuid('boucherie_id')->nullable()->constrained('boucheries')->nullOnDelete();
             $table->foreignUuid('fournisseur_id')->nullable()->constrained('fournisseurs')->nullOnDelete();
             $table->foreignUuid('achat_fournisseur_id')->nullable()->constrained('achats_fournisseurs')->nullOnDelete();
             $table->string('espece', 20);

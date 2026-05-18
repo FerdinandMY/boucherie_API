@@ -85,7 +85,7 @@ describe('GET /api/v1/auth/me', function () {
 
         $this->getJson('/api/v1/auth/me')
             ->assertOk()
-            ->assertJsonPath('id', $user->id)
+            ->assertJsonPath('data.id', $user->id)
             ->assertJsonMissing(['password']);
     });
 

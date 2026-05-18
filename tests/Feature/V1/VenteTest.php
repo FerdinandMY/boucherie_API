@@ -180,6 +180,12 @@ describe('GET /api/v1/ventes/{id}', function () {
 });
 
 describe('PATCH /api/v1/ventes/{id}/statut', function () {
+    beforeEach(function () {
+        EnumValeur::firstOrCreate(['type' => 'statut_vente', 'valeur' => 'validee'],  ['libelle' => 'Validée']);
+        EnumValeur::firstOrCreate(['type' => 'statut_vente', 'valeur' => 'annulee'],  ['libelle' => 'Annulée']);
+        EnumValeur::firstOrCreate(['type' => 'statut_vente', 'valeur' => 'en_cours'], ['libelle' => 'En cours']);
+    });
+
     it('met à jour le statut d\'une vente (boucher)', function () {
         $boucherie = Boucherie::factory()->create();
         $boucher   = boucherUser($boucherie);

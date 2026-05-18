@@ -59,7 +59,7 @@ class AchatFournisseurController extends Controller
                 abort(422, "Votre profil fournisseur n'est pas encore configuré. Contactez l'administrateur.");
             }
         } else {
-            $fournisseurId = null;
+            $fournisseurId = $request->validated()['fournisseur_id'] ?? null;
         }
 
         $achat = $this->service->create(

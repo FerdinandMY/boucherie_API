@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Boucherie;
 use App\Models\EnumValeur;
-use App\Models\MouvementStock;
+use App\Models\LigneVente;
 use App\Models\Produit;
 use App\Models\Stock;
 use App\Models\User;
@@ -13,196 +13,194 @@ use App\Services\VenteService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 
-describe('VenteService', function () {
-    beforeEach(function () {
-        $this->service   = app(VenteService::class);
-        $this->boucherie = Boucherie::factory()->create();
-        $this->user      = User::factory()->create(['boucherie_id' => $this->boucherie->id]);
+beforeEach(function () {
+    $this->service   = app(VenteService::class);
+    $this->boucherie = Boucherie::factory()->create();
+    $this->user      = User::factory()->create(['boucherie_id' => $this->boucherie->id]);
 
-        EnumValeur::firstOrCreate(
-            ['type' => 'type_vente', 'valeur' => 'comptoir'],
-            ['libelle' => 'Comptoir', 'systeme' => true]
-        );
-    });
+    EnumValeur::firstOrCreate(
+        ['type' => 'type_vente', 'valeur' => 'comptoir'],
+        ['libelle' => 'Comptoir', 'systeme' => true]
+    );
+});
 
-    describe('paginate()', function () {
-        it('retourne une liste paginée vide par défaut', function () {
-            $result = $this->service->paginate($this->boucherie->id);
+// ── paginate() ──────────────────────────────────────────────────────────────
 
-            expect($result->total())->toBe(0);
-        });
+it('VenteService::paginate() retourne une liste paginée vide par défaut', function () {
+    $result = $this->service->paginate($this->boucherie->id);
 
-        it('filtre par boucherie_id', function () {
-            $autreBoucherie = Boucherie::factory()->create();
-            $autreUser      = User::factory()->create(['boucherie_id' => $autreBoucherie->id]);
+    expect($result->total())->toBe(0);
+});
 
-            Vente::factory()->create(['boucherie_id' => $this->boucherie->id, 'user_id' => $this->user->id]);
-            Vente::factory()->create(['boucherie_id' => $autreBoucherie->id, 'user_id' => $autreUser->id]);
+it('VenteService::paginate() filtre par boucherie_id', function () {
+    $autreBoucherie = Boucherie::factory()->create();
+    $autreUser      = User::factory()->create(['boucherie_id' => $autreBoucherie->id]);
 
-            $result = $this->service->paginate($this->boucherie->id);
+    Vente::factory()->create(['boucherie_id' => $this->boucherie->id, 'user_id' => $this->user->id]);
+    Vente::factory()->create(['boucherie_id' => $autreBoucherie->id, 'user_id' => $autreUser->id]);
 
-            expect($result->total())->toBe(1);
-        });
+    $result = $this->service->paginate($this->boucherie->id);
 
-        it('filtre par statut', function () {
-            Vente::factory()->create(['boucherie_id' => $this->boucherie->id, 'user_id' => $this->user->id, 'statut' => 'en_cours']);
-            Vente::factory()->create(['boucherie_id' => $this->boucherie->id, 'user_id' => $this->user->id, 'statut' => 'annulee']);
+    expect($result->total())->toBe(1);
+});
 
-            $result = $this->service->paginate($this->boucherie->id, ['statut' => 'en_cours']);
+it('VenteService::paginate() filtre par statut', function () {
+    Vente::factory()->create(['boucherie_id' => $this->boucherie->id, 'user_id' => $this->user->id, 'statut' => 'en_cours']);
+    Vente::factory()->create(['boucherie_id' => $this->boucherie->id, 'user_id' => $this->user->id, 'statut' => 'annulee']);
 
-            expect($result->total())->toBe(1)
-                ->and($result->items()[0]->statut)->toBe('en_cours');
-        });
-    });
+    $result = $this->service->paginate($this->boucherie->id, ['statut' => 'en_cours']);
 
-    describe('create()', function () {
-        it('crée une vente, décrémente le stock et crée un mouvement', function () {
-            $produit = Produit::factory()->create(['boucherie_id' => $this->boucherie->id, 'prix_unitaire' => 3000]);
-            $stock   = Stock::factory()->create([
-                'boucherie_id' => $this->boucherie->id,
-                'produit_id'   => $produit->id,
-                'quantite'     => 100,
-            ]);
+    expect($result->total())->toBe(1)
+        ->and($result->items()[0]->statut)->toBe('en_cours');
+});
 
-            $vente = $this->service->create([
-                'boucherie_id' => $this->boucherie->id,
-                'type_vente'   => 'comptoir',
-                'lignes'       => [
-                    ['produit_id' => $produit->id, 'quantite' => 10, 'prix_unitaire' => 3000],
-                ],
-            ], $this->user->id);
+// ── create() ────────────────────────────────────────────────────────────────
 
-            expect($vente)->toBeInstanceOf(Vente::class)
-                ->and($vente->montant_total)->toBe('30000.00')
-                ->and($vente->statut)->toBe('en_cours');
+it('VenteService::create() crée une vente, décrémente le stock et crée un mouvement', function () {
+    $produit = Produit::factory()->create(['boucherie_id' => $this->boucherie->id, 'prix_unitaire' => 3000]);
+    $stock   = Stock::factory()->create([
+        'boucherie_id' => $this->boucherie->id,
+        'produit_id'   => $produit->id,
+        'quantite'     => 100,
+    ]);
 
-            $this->assertDatabaseHas('stocks', ['id' => $stock->id, 'quantite' => 90]);
-            $this->assertDatabaseHas('mouvements_stock', [
-                'stock_id' => $stock->id,
-                'type'     => 'sortie',
-                'quantite' => 10,
-            ]);
-        });
+    $vente = $this->service->create([
+        'boucherie_id' => $this->boucherie->id,
+        'type_vente'   => 'comptoir',
+        'lignes'       => [
+            ['produit_id' => $produit->id, 'quantite' => 10, 'prix_unitaire' => 3000],
+        ],
+    ], $this->user->id);
 
-        it('lève une ValidationException si le stock est insuffisant', function () {
-            $produit = Produit::factory()->create(['boucherie_id' => $this->boucherie->id]);
-            Stock::factory()->create([
-                'boucherie_id' => $this->boucherie->id,
-                'produit_id'   => $produit->id,
-                'quantite'     => 2,
-            ]);
+    expect($vente)->toBeInstanceOf(Vente::class)
+        ->and($vente->montant_total)->toBe('30000.00')
+        ->and($vente->statut)->toBe('en_cours');
 
-            expect(fn () => $this->service->create([
-                'boucherie_id' => $this->boucherie->id,
-                'type_vente'   => 'comptoir',
-                'lignes'       => [
-                    ['produit_id' => $produit->id, 'quantite' => 50],
-                ],
-            ], $this->user->id))->toThrow(ValidationException::class);
-        });
+    $this->assertDatabaseHas('stocks', ['id' => $stock->id, 'quantite' => 90]);
+    $this->assertDatabaseHas('mouvements_stock', [
+        'stock_id' => $stock->id,
+        'type'     => 'sortie',
+        'quantite' => 10,
+    ]);
+});
 
-        it('lève une ValidationException si le produit est introuvable', function () {
-            expect(fn () => $this->service->create([
-                'boucherie_id' => $this->boucherie->id,
-                'type_vente'   => 'comptoir',
-                'lignes'       => [
-                    ['produit_id' => '00000000-0000-0000-0000-000000000000', 'quantite' => 1],
-                ],
-            ], $this->user->id))->toThrow(ValidationException::class);
-        });
+it('VenteService::create() lève ValidationException si le stock est insuffisant', function () {
+    $produit = Produit::factory()->create(['boucherie_id' => $this->boucherie->id]);
+    Stock::factory()->create([
+        'boucherie_id' => $this->boucherie->id,
+        'produit_id'   => $produit->id,
+        'quantite'     => 2,
+    ]);
 
-        it('lève une ValidationException pour vente livraison sans client', function () {
-            expect(fn () => $this->service->create([
-                'boucherie_id' => $this->boucherie->id,
-                'type_vente'   => 'livraison',
-                'lignes'       => [],
-            ], $this->user->id))->toThrow(ValidationException::class);
-        });
-    });
+    expect(fn () => $this->service->create([
+        'boucherie_id' => $this->boucherie->id,
+        'type_vente'   => 'comptoir',
+        'lignes'       => [
+            ['produit_id' => $produit->id, 'quantite' => 50],
+        ],
+    ], $this->user->id))->toThrow(ValidationException::class);
+});
 
-    describe('updateStatut()', function () {
-        it('met à jour le statut d\'une vente', function () {
-            $vente = Vente::factory()->create([
-                'boucherie_id' => $this->boucherie->id,
-                'user_id'      => $this->user->id,
-                'statut'       => 'en_cours',
-            ]);
+it('VenteService::create() lève ValidationException si le produit est introuvable', function () {
+    expect(fn () => $this->service->create([
+        'boucherie_id' => $this->boucherie->id,
+        'type_vente'   => 'comptoir',
+        'lignes'       => [
+            ['produit_id' => '00000000-0000-0000-0000-000000000000', 'quantite' => 1],
+        ],
+    ], $this->user->id))->toThrow(ValidationException::class);
+});
 
-            $updated = $this->service->updateStatut($vente->id, ['statut' => 'validee'], $this->user->id);
+it('VenteService::create() lève ValidationException pour vente livraison sans client', function () {
+    expect(fn () => $this->service->create([
+        'boucherie_id' => $this->boucherie->id,
+        'type_vente'   => 'livraison',
+        'lignes'       => [],
+    ], $this->user->id))->toThrow(ValidationException::class);
+});
 
-            expect($updated->statut)->toBe('validee');
-        });
+// ── updateStatut() ──────────────────────────────────────────────────────────
 
-        it('annule une vente et restitue le stock', function () {
-            $produit = Produit::factory()->create(['boucherie_id' => $this->boucherie->id]);
-            $stock   = Stock::factory()->create([
-                'boucherie_id' => $this->boucherie->id,
-                'produit_id'   => $produit->id,
-                'quantite'     => 30,
-            ]);
-            $vente = Vente::factory()->create([
-                'boucherie_id' => $this->boucherie->id,
-                'user_id'      => $this->user->id,
-                'statut'       => 'en_cours',
-            ]);
-            \App\Models\LigneVente::create([
-                'vente_id'      => $vente->id,
-                'produit_id'    => $produit->id,
-                'quantite'      => 10,
-                'prix_unitaire' => 2000,
-                'sous_total'    => 20000,
-            ]);
+it('VenteService::updateStatut() met à jour le statut d\'une vente', function () {
+    $vente = Vente::factory()->create([
+        'boucherie_id' => $this->boucherie->id,
+        'user_id'      => $this->user->id,
+        'statut'       => 'en_cours',
+    ]);
 
-            $this->service->updateStatut($vente->id, ['statut' => 'annulee'], $this->user->id);
+    $updated = $this->service->updateStatut($vente->id, ['statut' => 'validee'], $this->user->id);
 
-            $this->assertDatabaseHas('stocks', ['id' => $stock->id, 'quantite' => 40]);
-            $this->assertDatabaseHas('mouvements_stock', [
-                'stock_id' => $stock->id,
-                'type'     => 'entree',
-                'quantite' => 10,
-            ]);
-        });
+    expect($updated->statut)->toBe('validee');
+});
 
-        it('lève une ValidationException si la vente ne peut plus être annulée', function () {
-            $vente = Vente::factory()->create([
-                'boucherie_id' => $this->boucherie->id,
-                'user_id'      => $this->user->id,
-                'statut'       => 'annulee',
-            ]);
+it('VenteService::updateStatut() annule une vente et restitue le stock', function () {
+    $produit = Produit::factory()->create(['boucherie_id' => $this->boucherie->id]);
+    $stock   = Stock::factory()->create([
+        'boucherie_id' => $this->boucherie->id,
+        'produit_id'   => $produit->id,
+        'quantite'     => 30,
+    ]);
+    $vente = Vente::factory()->create([
+        'boucherie_id' => $this->boucherie->id,
+        'user_id'      => $this->user->id,
+        'statut'       => 'en_cours',
+    ]);
+    LigneVente::create([
+        'vente_id'      => $vente->id,
+        'produit_id'    => $produit->id,
+        'quantite'      => 10,
+        'prix_unitaire' => 2000,
+        'sous_total'    => 20000,
+    ]);
 
-            expect(fn () => $this->service->updateStatut($vente->id, ['statut' => 'annulee'], $this->user->id))
-                ->toThrow(ValidationException::class);
-        });
-    });
+    $this->service->updateStatut($vente->id, ['statut' => 'annulee'], $this->user->id);
 
-    describe('findById()', function () {
-        it('retourne la vente correspondante', function () {
-            $vente = Vente::factory()->create([
-                'boucherie_id' => $this->boucherie->id,
-                'user_id'      => $this->user->id,
-            ]);
+    $this->assertDatabaseHas('stocks', ['id' => $stock->id, 'quantite' => 40]);
+    $this->assertDatabaseHas('mouvements_stock', [
+        'stock_id' => $stock->id,
+        'type'     => 'entree',
+        'quantite' => 10,
+    ]);
+});
 
-            $found = $this->service->findById($vente->id);
+it('VenteService::updateStatut() lève ValidationException si la vente ne peut plus être annulée', function () {
+    $vente = Vente::factory()->create([
+        'boucherie_id' => $this->boucherie->id,
+        'user_id'      => $this->user->id,
+        'statut'       => 'annulee',
+    ]);
 
-            expect($found->id)->toBe($vente->id);
-        });
+    expect(fn () => $this->service->updateStatut($vente->id, ['statut' => 'annulee'], $this->user->id))
+        ->toThrow(ValidationException::class);
+});
 
-        it('lève ModelNotFoundException pour un id inexistant', function () {
-            expect(fn () => $this->service->findById('00000000-0000-0000-0000-000000000000'))
-                ->toThrow(ModelNotFoundException::class);
-        });
-    });
+// ── findById() ──────────────────────────────────────────────────────────────
 
-    describe('delete()', function () {
-        it('supprime une vente', function () {
-            $vente = Vente::factory()->create([
-                'boucherie_id' => $this->boucherie->id,
-                'user_id'      => $this->user->id,
-            ]);
+it('VenteService::findById() retourne la vente correspondante', function () {
+    $vente = Vente::factory()->create([
+        'boucherie_id' => $this->boucherie->id,
+        'user_id'      => $this->user->id,
+    ]);
 
-            $this->service->delete($vente->id);
+    $found = $this->service->findById($vente->id);
 
-            $this->assertDatabaseMissing('ventes', ['id' => $vente->id]);
-        });
-    });
+    expect($found->id)->toBe($vente->id);
+});
+
+it('VenteService::findById() lève ModelNotFoundException pour un id inexistant', function () {
+    expect(fn () => $this->service->findById('00000000-0000-0000-0000-000000000000'))
+        ->toThrow(ModelNotFoundException::class);
+});
+
+// ── delete() ────────────────────────────────────────────────────────────────
+
+it('VenteService::delete() supprime une vente', function () {
+    $vente = Vente::factory()->create([
+        'boucherie_id' => $this->boucherie->id,
+        'user_id'      => $this->user->id,
+    ]);
+
+    $this->service->delete($vente->id);
+
+    $this->assertDatabaseMissing('ventes', ['id' => $vente->id]);
 });

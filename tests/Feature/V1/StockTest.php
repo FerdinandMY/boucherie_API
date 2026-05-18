@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Boucherie;
+use App\Models\EnumValeur;
 use App\Models\Produit;
 use App\Models\Stock;
 use Laravel\Sanctum\Sanctum;
@@ -10,13 +11,13 @@ use Laravel\Sanctum\Sanctum;
 describe('GET /api/v1/stocks', function () {
     it('retourne la liste des stocks de la boucherie (boucher)', function () {
         $boucherie = Boucherie::factory()->create();
-        $produit   = Produit::factory()->create(['boucherie_id' => $boucherie->id]);
         Sanctum::actingAs(boucherUser($boucherie));
 
-        Stock::factory()->count(3)->create([
-            'boucherie_id' => $boucherie->id,
-            'produit_id'   => $produit->id,
-        ]);
+        Produit::factory()->count(3)->create(['boucherie_id' => $boucherie->id])
+            ->each(fn ($p) => Stock::factory()->create([
+                'boucherie_id' => $boucherie->id,
+                'produit_id'   => $p->id,
+            ]));
 
         $this->getJson('/api/v1/stocks')
             ->assertOk()
@@ -78,6 +79,8 @@ describe('GET /api/v1/stocks/{id}/mouvements', function () {
 
 describe('POST /api/v1/stocks/{id}/ajuster', function () {
     it('ajuste la quantité d\'un stock (boucher)', function () {
+        EnumValeur::firstOrCreate(['type' => 'type_mouvement', 'valeur' => 'entree'], ['libelle' => 'Entrée']);
+
         $boucherie = Boucherie::factory()->create();
         $boucher   = boucherUser($boucherie);
         $produit   = Produit::factory()->create(['boucherie_id' => $boucherie->id]);

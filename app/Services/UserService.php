@@ -52,7 +52,7 @@ class UserService
                 ]);
             }
 
-            return $user->load(['roles', 'boucherie']);
+            return $user->load(['roles', 'boucherie', 'fournisseur']);
         });
     }
 
@@ -81,7 +81,7 @@ class UserService
                 );
             }
 
-            return $user->load(['roles', 'boucherie']);
+            return $user->load(['roles', 'boucherie', 'fournisseur']);
         });
     }
 

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Boucherie;
+use App\Models\EnumValeur;
 use App\Models\Produit;
 use Laravel\Sanctum\Sanctum;
 
@@ -31,6 +32,11 @@ describe('GET /api/v1/produits', function () {
 });
 
 describe('POST /api/v1/produits', function () {
+    beforeEach(function () {
+        EnumValeur::firstOrCreate(['type' => 'categorie_produit', 'valeur' => 'boeuf'], ['libelle' => 'Bœuf']);
+        EnumValeur::firstOrCreate(['type' => 'unite_produit', 'valeur' => 'kg'], ['libelle' => 'Kilogramme']);
+    });
+
     it('crée un produit (boucher)', function () {
         $boucherie = Boucherie::factory()->create();
         Sanctum::actingAs(boucherUser($boucherie));

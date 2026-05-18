@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('achats_fournisseurs', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('boucherie_id')->constrained('boucheries')->cascadeOnDelete();
+            $table->foreignUuid('boucherie_id')->nullable()->constrained('boucheries')->nullOnDelete();
             $table->foreignUuid('fournisseur_id')->constrained('fournisseurs')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('reference', 100)->nullable();

@@ -7,16 +7,16 @@ use App\Models\Fournisseur;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class)->in('Feature', 'Unit');
-
-beforeEach(function () {
-    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-
-    Role::firstOrCreate(['name' => 'admin',       'guard_name' => 'web']);
-    Role::firstOrCreate(['name' => 'boucher',     'guard_name' => 'web']);
-    Role::firstOrCreate(['name' => 'fournisseur', 'guard_name' => 'web']);
-});
+uses(TestCase::class, RefreshDatabase::class)
+    ->beforeEach(function () {
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        Role::firstOrCreate(['name' => 'admin',       'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'boucher',     'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'fournisseur', 'guard_name' => 'web']);
+    })
+    ->in('Feature', 'Unit');
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
