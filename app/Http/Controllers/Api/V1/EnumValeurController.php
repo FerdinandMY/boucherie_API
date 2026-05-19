@@ -70,7 +70,7 @@ class EnumValeurController extends Controller
      */
     public function update(UpdateEnumValeurRequest $request, string $type, string $id): JsonResponse
     {
-        $valeur = $this->service->update($id, $request->validated());
+        $valeur = $this->service->update($id, $request->validated(), $request->user()->boucherie_id);
 
         return response()->json([
             'data'    => new EnumValeurResource($valeur),
@@ -87,9 +87,9 @@ class EnumValeurController extends Controller
      * @urlParam id string required UUID de la valeur. Example: 9d4b2c1a-...
      * @response 204 {}
      */
-    public function destroy(string $type, string $id): JsonResponse
+    public function destroy(Request $request, string $type, string $id): JsonResponse
     {
-        $this->service->delete($id);
+        $this->service->delete($id, $request->user()->boucherie_id);
 
         return response()->json(null, 204);
     }

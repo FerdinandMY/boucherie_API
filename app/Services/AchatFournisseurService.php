@@ -34,6 +34,10 @@ class AchatFournisseurService
             $data['fournisseur_id'] = $fournisseurId;
             $data['user_id']       = $userId;
 
+            // Ignorer le montant soumis — toujours calculer côté serveur
+            unset($data['montant_total']);
+            $data['montant_total'] = 0;
+
             $achat = $this->repository->create($data);
 
             foreach ($animaux as $animalData) {
@@ -47,9 +51,7 @@ class AchatFournisseurService
             }
 
             $montantCalcule = array_sum(array_column($animaux, 'prix_achat'));
-            if ($montantCalcule > 0 && empty($data['montant_total'])) {
-                $achat->update(['montant_total' => $montantCalcule]);
-            }
+            $achat->update(['montant_total' => $montantCalcule]);
 
             return $achat->fresh('animaux');
         });

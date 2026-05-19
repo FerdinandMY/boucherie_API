@@ -11,17 +11,11 @@ class AuthService
 {
     public function register(array $data): array
     {
-        $role = $data['role'] ?? 'boucher';
-        unset($data['role']);
-
         $user = User::create([
-            'name'         => $data['name'],
-            'email'        => $data['email'],
-            'password'     => Hash::make($data['password']),
-            'boucherie_id' => $data['boucherie_id'] ?? null,
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            'password' => Hash::make($data['password']),
         ]);
-
-        $user->assignRole($role);
 
         $token = $user->createToken('api-token')->plainTextToken;
 

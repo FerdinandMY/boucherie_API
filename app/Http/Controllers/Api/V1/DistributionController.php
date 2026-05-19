@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDistributionRequest;
 use App\Http\Resources\DistributionResource;
+use App\Models\Abattage;
 use App\Services\DistributionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -52,7 +53,17 @@ class DistributionController extends Controller
      */
     public function store(StoreDistributionRequest $request): JsonResponse
     {
-        $distribution = $this->service->create($request->validated(), $request->user()->id);
+        $user = $request->user();
+
+        // Un fournisseur ne peut distribuer que depuis ses propres abattages
+        if ($user->hasRole('fournisseur')) {
+            $abattage = Abattage::find($request->validated()['abattage_id']);
+            if ($abattage && $abattage->user_id !== $user->id) {
+                abort(403, "Vous n'êtes pas autorisé à distribuer depuis cet abattage.");
+            }
+        }
+
+        $distribution = $this->service->create($request->validated(), $user->id);
 
         return response()->json([
             'data'    => new DistributionResource($distribution),

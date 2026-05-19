@@ -30,9 +30,14 @@ class EnumValeurService
         ]);
     }
 
-    public function update(string $id, array $data): EnumValeur
+    public function update(string $id, array $data, ?string $boucherieId = null): EnumValeur
     {
         $valeur = $this->repository->findOrFail($id);
+
+        // Les valeurs custom d'une autre boucherie ne sont pas modifiables
+        if (!$valeur->systeme && $valeur->boucherie_id !== null && $valeur->boucherie_id !== $boucherieId) {
+            abort(403, 'Action non autorisée sur cette valeur.');
+        }
 
         if ($valeur->systeme && isset($data['valeur']) && $data['valeur'] !== $valeur->valeur) {
             throw ValidationException::withMessages([
@@ -48,7 +53,7 @@ class EnumValeurService
         return $valeur->fresh();
     }
 
-    public function delete(string $id): void
+    public function delete(string $id, ?string $boucherieId = null): void
     {
         $valeur = $this->repository->findOrFail($id);
 
@@ -56,6 +61,11 @@ class EnumValeurService
             throw ValidationException::withMessages([
                 'id' => ['Une valeur système ne peut pas être supprimée.'],
             ]);
+        }
+
+        // Les valeurs custom d'une autre boucherie ne sont pas supprimables
+        if ($valeur->boucherie_id !== null && $valeur->boucherie_id !== $boucherieId) {
+            abort(403, 'Action non autorisée sur cette valeur.');
         }
 
         $this->repository->delete($id);

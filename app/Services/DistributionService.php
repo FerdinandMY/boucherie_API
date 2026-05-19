@@ -65,9 +65,7 @@ class DistributionService
         $distribution = $this->repository->findOrFail($id);
 
         if ($distribution->fournisseur_user_id !== $fournisseurUserId) {
-            throw ValidationException::withMessages([
-                'distribution' => ['Vous ne pouvez pas modifier cette distribution.'],
-            ]);
+            abort(403, 'Vous ne pouvez pas modifier cette distribution.');
         }
 
         if ($distribution->statut !== 'en_attente') {
