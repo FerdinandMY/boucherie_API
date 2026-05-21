@@ -19,6 +19,8 @@ class UpdateUserRequest extends FormRequest
             'password'     => ['sometimes', 'string', 'min:8'],
             'role'         => ['sometimes', 'string', Rule::in(['admin', 'boucher', 'fournisseur'])],
             'boucherie_id' => ['sometimes', 'nullable', 'uuid', 'exists:boucheries,id'],
+            'boucherie_ids' => ['sometimes', 'array'],
+            'boucherie_ids.*'   => ['uuid', 'exists:boucheries,id'],
 
             'fournisseur.nom'       => ['sometimes', 'string', 'max:150'],
             'fournisseur.contact'   => ['sometimes', 'nullable', 'string', 'max:150'],

@@ -20,7 +20,9 @@ class StoreBoucherieRequest extends FormRequest
             'adresse'   => ['nullable', 'string', 'max:500'],
             'ville'     => ['nullable', 'string', 'max:100'],
             'telephone' => ['nullable', 'string', 'max:20'],
-            'actif'     => ['boolean'],
+            'actif'            => ['boolean'],
+            'attachment_ids'   => ['sometimes', 'array', 'max:3'],
+            'attachment_ids.*' => ['uuid', 'exists:attachments,id'],
         ];
     }
 }

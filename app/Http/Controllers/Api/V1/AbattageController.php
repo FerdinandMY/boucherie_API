@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Concerns\LinksAttachments;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAbattageRequest;
 use App\Http\Resources\AbattageResource;
@@ -19,6 +20,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
  */
 class AbattageController extends Controller
 {
+    use LinksAttachments;
+
     public function __construct(private readonly AbattageService $service) {}
 
     /**
@@ -47,9 +50,13 @@ class AbattageController extends Controller
      */
     public function store(StoreAbattageRequest $request): JsonResponse
     {
-        $abattage = $this->service->create(
-            $request->validated(),
-            $request->user()->id
+        $data          = $request->validated();
+        $attachmentIds = $this->stripAttachmentIds($data);
+
+        $abattage = $this->linkAttachments(
+            $this->service->create($data, $request->user()->id),
+            $attachmentIds,
+            $request->user(),
         );
 
         return response()->json([

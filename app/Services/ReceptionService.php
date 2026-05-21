@@ -99,7 +99,7 @@ class ReceptionService
                 $stockCat->increment('poids_kg_disponible', (float) $ligne['poids_kg_recu']);
             }
 
-            return $reception->fresh(['distribution.produit', 'distribution.fournisseurUser', 'lignes']);
+            return $reception->fresh(['distribution.produit', 'distribution.fournisseurUser', 'lignes', 'attachments']);
         });
     }
 }

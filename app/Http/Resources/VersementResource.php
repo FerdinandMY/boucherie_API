@@ -42,6 +42,7 @@ class VersementResource extends JsonResource
             'notes'               => $this->notes,
             'valide_par'          => $this->valide_par,
             'valide_le'           => $this->valide_le?->toISOString(),
+            'attachments'         => AttachmentResource::collection($this->whenLoaded('attachments')),
             'created_at'          => $this->created_at?->toISOString(),
             'updated_at'          => $this->updated_at?->toISOString(),
         ];

@@ -24,6 +24,7 @@ class FournisseurResource extends JsonResource
     {
         return [
             'id'           => $this->id,
+            'user_id'      => $this->user_id,
             'boucherie_id' => $this->boucherie_id,
             'nom'          => $this->nom,
             'contact'      => $this->contact,

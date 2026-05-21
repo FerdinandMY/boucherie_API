@@ -30,6 +30,31 @@ class UserResource extends JsonResource
             'role'         => $this->whenLoaded('roles', fn () => $this->roles->first()?->name),
             'boucherie_id'       => $this->boucherie_id,
             'boucherie'          => $this->whenLoaded('boucherie', fn () => new BoucherieResource($this->boucherie)),
+            'fournisseur_user_id' => $this->when(
+                $this->boucherie_id !== null
+                    && $this->relationLoaded('boucherie')
+                    && $this->boucherie?->relationLoaded('fournisseurAssigne'),
+                fn () => $this->boucherie->fournisseurAssigne->first()?->user_id,
+            ),
+            'fournisseur_assigne' => $this->when(
+                $this->boucherie_id !== null
+                    && $this->relationLoaded('boucherie')
+                    && $this->boucherie?->relationLoaded('fournisseurAssigne')
+                    && $this->boucherie->fournisseurAssigne->isNotEmpty(),
+                fn () => new FournisseurResource($this->boucherie->fournisseurAssigne->first()),
+            ),
+            'boucherie_ids'    => $this->when(
+                $this->relationLoaded('fournisseur')
+                    && $this->fournisseur
+                    && $this->fournisseur->relationLoaded('boucheries'),
+                fn () => $this->fournisseur->boucheries->pluck('id')->values()->all(),
+            ),
+            'boucheries'         => $this->when(
+                $this->relationLoaded('fournisseur')
+                    && $this->fournisseur
+                    && $this->fournisseur->relationLoaded('boucheries'),
+                fn () => BoucherieResource::collection($this->fournisseur->boucheries),
+            ),
             'entite_fournisseur' => $this->whenLoaded('fournisseur', fn () => new FournisseurResource($this->fournisseur)),
             'created_at'         => $this->created_at?->toISOString(),
         ];

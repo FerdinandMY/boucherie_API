@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAttachments;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Vente extends Model
 {
-    use HasFactory, HasUuids;
+    use HasAttachments, HasFactory, HasUuids;
 
     protected $fillable = [
         'boucherie_id', 'client_id', 'user_id',

@@ -12,11 +12,15 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
+    public function __construct(
+        private readonly FournisseurBoucherieService $fournisseurBoucherieService,
+    ) {}
+
     public function paginate(?string $boucherieId = null, int $perPage = 15): LengthAwarePaginator
     {
         return User::query()
             ->when($boucherieId, fn ($q) => $q->where('boucherie_id', $boucherieId))
-            ->with('roles')
+            ->with(['roles', 'boucherie.fournisseurAssigne.user', 'fournisseur.boucheries'])
             ->select(['id', 'name', 'email', 'boucherie_id', 'created_at'])
             ->latest()
             ->paginate($perPage);
@@ -24,7 +28,7 @@ class UserService
 
     public function findById(string $id): User
     {
-        return User::with(['roles', 'boucherie', 'fournisseur'])->findOrFail($id);
+        return User::with(['roles', 'boucherie.fournisseurAssigne.user', 'fournisseur.boucheries'])->findOrFail($id);
     }
 
     public function create(array $data): User
@@ -52,7 +56,7 @@ class UserService
                 ]);
             }
 
-            return $user->load(['roles', 'boucherie', 'fournisseur']);
+            return $user->load(['roles', 'boucherie.fournisseurAssigne.user', 'fournisseur.boucheries']);
         });
     }
 
@@ -61,7 +65,8 @@ class UserService
         return DB::transaction(function () use ($id, $data) {
             $user            = User::findOrFail($id);
             $fournisseurData = $data['fournisseur'] ?? null;
-            unset($data['fournisseur']);
+            $boucherieIds    = $data['boucherie_ids'] ?? null;
+            unset($data['fournisseur'], $data['boucherie_ids']);
 
             if (isset($data['role'])) {
                 $user->syncRoles([$data['role']]);
@@ -81,7 +86,17 @@ class UserService
                 );
             }
 
-            return $user->load(['roles', 'boucherie', 'fournisseur']);
+            if ($boucherieIds !== null && $user->hasRole('fournisseur')) {
+                $fournisseur = Fournisseur::query()
+                    ->where('user_id', $user->id)
+                    ->first();
+
+                if ($fournisseur) {
+                    $this->fournisseurBoucherieService->syncForFournisseur($fournisseur, $boucherieIds);
+                }
+            }
+
+            return $user->load(['roles', 'boucherie.fournisseurAssigne.user', 'fournisseur.boucheries']);
         });
     }
 

@@ -36,6 +36,9 @@ class AbattageResource extends JsonResource
             'rendement_pct'      => $this->rendement_pct,
             'notes'              => $this->notes,
             'stocks'             => StockResource::collection($this->whenLoaded('stocks')),
+            'distributions'    => DistributionResource::collection($this->whenLoaded('distributions')),
+            'lignes'             => $this->whenLoaded('lignes'),
+            'attachments'        => AttachmentResource::collection($this->whenLoaded('attachments')),
             'created_at'         => $this->created_at?->toISOString(),
             'updated_at'         => $this->updated_at?->toISOString(),
         ];

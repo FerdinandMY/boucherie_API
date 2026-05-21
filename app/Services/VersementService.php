@@ -11,7 +11,10 @@ use Illuminate\Validation\ValidationException;
 
 class VersementService
 {
-    public function __construct(private readonly VersementRepository $repository) {}
+    public function __construct(
+        private readonly VersementRepository $repository,
+        private readonly FournisseurBoucherieService $fournisseurBoucherieService,
+    ) {}
 
     public function paginateByBoucherie(string $boucherieId): LengthAwarePaginator
     {
@@ -35,6 +38,19 @@ class VersementService
 
     public function create(array $data, ?string $boucherieId): Versement
     {
+        if ($boucherieId === null || $boucherieId === '') {
+            throw ValidationException::withMessages([
+                'boucherie_id' => ['Aucune boucherie rattachée à cet utilisateur.'],
+            ]);
+        }
+
+        $fournisseurUserId = (int) ($data['fournisseur_user_id'] ?? 0);
+
+        $this->fournisseurBoucherieService->assertBoucherieServedByFournisseurUser(
+            $boucherieId,
+            $fournisseurUserId,
+        );
+
         $data['boucherie_id'] = $boucherieId;
         $data['statut']       = 'en_attente';
 

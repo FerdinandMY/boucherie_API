@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Concerns\LinksAttachments;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVersementRequest;
 use App\Http\Requests\UpdateVersementStatutRequest;
 use App\Http\Resources\VersementResource;
+use App\Services\FournisseurBoucherieService;
 use App\Services\VersementService;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -21,6 +24,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
  */
 class VersementController extends Controller
 {
+    use LinksAttachments;
+
     public function __construct(private readonly VersementService $service) {}
 
     /**
@@ -53,9 +58,33 @@ class VersementController extends Controller
      */
     public function store(StoreVersementRequest $request): JsonResponse
     {
-        $versement = $this->service->create(
-            $request->validated(),
-            $request->user()->boucherie_id,
+        $user          = $request->user();
+        $data          = $request->validated();
+        $attachmentIds = $this->stripAttachmentIds($data);
+
+        if ($user->hasRole('boucher')) {
+            $expectedFournisseurUserId = app(FournisseurBoucherieService::class)
+                ->fournisseurUserIdForBoucherie($user->boucherie_id);
+
+            if ($expectedFournisseurUserId === null) {
+                throw ValidationException::withMessages([
+                    'fournisseur_user_id' => [
+                        'Aucun fournisseur n\'est rattaché à votre boucherie. Contactez l\'administrateur.',
+                    ],
+                ]);
+            }
+
+            if ((int) ($data['fournisseur_user_id'] ?? 0) !== $expectedFournisseurUserId) {
+                abort(403, 'Ce versement doit être adressé à votre fournisseur assigné.');
+            }
+
+            $data['fournisseur_user_id'] = $expectedFournisseurUserId;
+        }
+
+        $versement = $this->linkAttachments(
+            $this->service->create($data, $user->boucherie_id),
+            $attachmentIds,
+            $request->user(),
         );
 
         return response()->json([

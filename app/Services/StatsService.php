@@ -225,7 +225,7 @@ class StatsService
             'abattages' => [
                 'total'           => (clone $abattagesBase)->count(),
                 'poids_total_kg'  => (float) (clone $abattagesBase)->sum('poids_carcasse_kg'),
-                'rendement_moyen' => (float) round((clone $abattagesBase)->avg('rendement_pct') ?? 0, 2),
+                'rendement_moyen' => round((float) ((clone $abattagesBase)->avg('rendement_pct') ?? 0), 2),
             ],
             'distributions' => [
                 'en_attente' => (int) ($distributionsParStatut['en_attente']->total ?? 0),

@@ -13,6 +13,8 @@ class RecetteJournaliere extends Model
 {
     use HasUuids;
 
+    protected $table = 'recettes_journalieres';
+
     protected $fillable = [
         'boucherie_id', 'fournisseur_id', 'date',
         'montant_total', 'montant_verse', 'statut_versement', 'notes',

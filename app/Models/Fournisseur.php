@@ -7,6 +7,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Fournisseur extends Model
@@ -15,9 +17,20 @@ class Fournisseur extends Model
 
     protected $fillable = ['user_id', 'boucherie_id', 'nom', 'contact', 'telephone', 'email', 'adresse'];
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /** Boucheries desservies par le fournisseur (affectation admin). */
+    public function boucheries(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Boucherie::class,
+            'fournisseur_boucherie',
+            'fournisseur_id',
+            'boucherie_id',
+        )->withTimestamps();
     }
 
     public function animaux(): HasMany

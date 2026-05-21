@@ -13,7 +13,10 @@ use Illuminate\Validation\ValidationException;
 
 class DistributionService
 {
-    public function __construct(private readonly DistributionRepository $repository) {}
+    public function __construct(
+        private readonly DistributionRepository $repository,
+        private readonly FournisseurBoucherieService $fournisseurBoucherieService,
+    ) {}
 
     public function paginateByFournisseur(int $fournisseurUserId): LengthAwarePaginator
     {
@@ -41,8 +44,13 @@ class DistributionService
             $lignes = $data['lignes'] ?? [];
             unset($data['lignes']);
 
+            $this->fournisseurBoucherieService->assertBoucherieServedByFournisseurUser(
+                (string) $data['boucherie_id'],
+                $fournisseurUserId,
+            );
+
             $data['fournisseur_user_id'] = $fournisseurUserId;
-            $data['statut']             = 'en_attente';
+            $data['statut']              = 'en_attente';
 
             $distribution = $this->repository->create($data);
 

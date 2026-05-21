@@ -37,7 +37,7 @@ class VenteRepository
     public function findOrFail(string $id): Vente
     {
         return $this->model->query()
-            ->with(['client', 'user', 'lignes.produit', 'paiements', 'livraison'])
+            ->with(['client', 'user', 'lignes.produit', 'paiements', 'livraison', 'attachments'])
             ->findOrFail($id);
     }
 

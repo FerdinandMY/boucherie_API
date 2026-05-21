@@ -40,7 +40,7 @@ class VersementRepository
     public function findOrFail(string $id): Versement
     {
         return $this->model->query()
-            ->with(['boucherie', 'fournisseurUser', 'validePar'])
+            ->with(['boucherie', 'fournisseurUser', 'validePar', 'attachments'])
             ->findOrFail($id);
     }
 

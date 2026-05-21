@@ -35,7 +35,17 @@ class AbattageRepository
 
     public function findOrFail(string $id): Abattage
     {
-        return $this->model->query()->with(['animal', 'user', 'stocks.mouvements'])->findOrFail($id);
+        return $this->model->query()
+            ->with([
+                'animal',
+                'user',
+                'stocks.produit',
+                'distributions.boucherie',
+                'distributions.produit',
+                'lignes',
+                'attachments',
+            ])
+            ->findOrFail($id);
     }
 
     public function create(array $data): Abattage
