@@ -46,8 +46,10 @@ describe('POST /api/v1/distributions', function () {
         Sanctum::actingAs($user);
 
         $boucherie = Boucherie::factory()->create();
-        $produit   = Produit::factory()->create(['boucherie_id' => $boucherie->id]);
-        $abattage  = Abattage::factory()->create([
+        $fournisseur->boucheries()->attach($boucherie->id);
+
+        $produit  = Produit::factory()->create(['boucherie_id' => $boucherie->id]);
+        $abattage = Abattage::factory()->create([
             'boucherie_id' => $boucherie->id,
             'user_id'      => $user->id,
         ]);

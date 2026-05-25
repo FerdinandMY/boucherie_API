@@ -38,16 +38,18 @@ class DistributionService
         return $this->repository->findOrFail($id);
     }
 
-    public function create(array $data, int $fournisseurUserId): Distribution
+    public function create(array $data, int $fournisseurUserId, bool $skipBoucherieCheck = false): Distribution
     {
-        return DB::transaction(function () use ($data, $fournisseurUserId) {
+        return DB::transaction(function () use ($data, $fournisseurUserId, $skipBoucherieCheck) {
             $lignes = $data['lignes'] ?? [];
             unset($data['lignes']);
 
-            $this->fournisseurBoucherieService->assertBoucherieServedByFournisseurUser(
-                (string) $data['boucherie_id'],
-                $fournisseurUserId,
-            );
+            if (! $skipBoucherieCheck) {
+                $this->fournisseurBoucherieService->assertBoucherieServedByFournisseurUser(
+                    (string) $data['boucherie_id'],
+                    $fournisseurUserId,
+                );
+            }
 
             $data['fournisseur_user_id'] = $fournisseurUserId;
             $data['statut']              = 'en_attente';

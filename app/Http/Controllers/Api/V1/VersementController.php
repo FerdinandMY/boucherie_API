@@ -74,7 +74,7 @@ class VersementController extends Controller
                 ]);
             }
 
-            if ((int) ($data['fournisseur_user_id'] ?? 0) !== $expectedFournisseurUserId) {
+            if (($data['fournisseur_user_id'] ?? '') !== $expectedFournisseurUserId) {
                 abort(403, 'Ce versement doit être adressé à votre fournisseur assigné.');
             }
 

@@ -40,10 +40,11 @@ describe('GET /api/v1/versements', function () {
 
 describe('POST /api/v1/versements', function () {
     it('crée un versement (boucher)', function () {
-        $boucherie    = Boucherie::factory()->create();
-        $boucher      = boucherUser($boucherie);
-        $fournisseur  = Fournisseur::factory()->create();
-        $fourn_user   = fournisseurUser($fournisseur);
+        $boucherie   = Boucherie::factory()->create();
+        $boucher     = boucherUser($boucherie);
+        $fournisseur = Fournisseur::factory()->create();
+        $fourn_user  = fournisseurUser($fournisseur);
+        $fournisseur->boucheries()->attach($boucherie->id);
         Sanctum::actingAs($boucher);
 
         $this->postJson('/api/v1/versements', [

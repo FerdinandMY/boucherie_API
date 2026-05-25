@@ -63,7 +63,11 @@ class DistributionController extends Controller
             }
         }
 
-        $distribution = $this->service->create($request->validated(), $user->id);
+        $distribution = $this->service->create(
+            $request->validated(),
+            $user->id,
+            skipBoucherieCheck: ! $user->hasRole('fournisseur'),
+        );
 
         return response()->json([
             'data'    => new DistributionResource($distribution),
