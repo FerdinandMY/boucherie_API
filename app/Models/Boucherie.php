@@ -4,18 +4,31 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAttachments;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Boucherie extends Model
 {
-    use HasFactory, HasUuids;
+    use HasAttachments, HasFactory, HasUuids;
 
     protected $fillable = ['nom', 'adresse', 'ville', 'telephone', 'actif'];
 
     protected $casts = ['actif' => 'boolean'];
+
+    /** Fournisseur unique desservant cette boucherie (contrainte pivot). */
+    public function fournisseurAssigne(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Fournisseur::class,
+            'fournisseur_boucherie',
+            'boucherie_id',
+            'fournisseur_id',
+        )->withTimestamps();
+    }
 
     public function users(): HasMany
     {

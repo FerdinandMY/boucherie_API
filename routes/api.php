@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AbattageController;
+use App\Http\Controllers\Api\V1\AttachmentController;
 use App\Http\Controllers\Api\V1\AchatFournisseurController;
 use App\Http\Controllers\Api\V1\AnimalController;
 use App\Http\Controllers\Api\V1\AuthController;
@@ -37,6 +38,10 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
+
+        // ── Pièces jointes audio ─────────────────────────────────────────────
+        Route::post('attachments', [AttachmentController::class, 'store']);
+        Route::get('attachments/{attachment}/stream', [AttachmentController::class, 'stream']);
 
         // ── Statistiques ─────────────────────────────────────────────────────
         Route::middleware('role:admin')->get('stats/admin',       [StatsController::class, 'admin']);

@@ -94,7 +94,7 @@ class AbattageService
                 ]);
             }
 
-            return $abattage->fresh(['animal', 'stocks.produit', 'distributions', 'lignes']);
+            return $abattage->fresh(['animal', 'stocks.produit', 'distributions', 'lignes', 'attachments']);
         });
     }
 }

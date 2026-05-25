@@ -17,6 +17,8 @@ class StoreReceptionRequest extends FormRequest
             'quantite_recue'  => ['required', 'numeric', 'min:0.001'],
             'date_reception'  => ['required', 'date'],
             'notes'           => ['nullable', 'string', 'max:1000'],
+            'attachment_ids'  => ['sometimes', 'array', 'max:3'],
+            'attachment_ids.*'=> ['uuid', 'exists:attachments,id'],
         ];
     }
 }

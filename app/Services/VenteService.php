@@ -95,7 +95,7 @@ class VenteService
 
             $vente->update(['montant_total' => $montantTotal]);
 
-            return $vente->fresh(['client', 'lignes.produit', 'paiements']);
+            return $vente->fresh(['client', 'lignes.produit', 'paiements', 'attachments']);
         });
     }
 
@@ -133,7 +133,7 @@ class VenteService
 
             $vente->update(['statut' => $nouveauStatut]);
 
-            return $vente->fresh(['client', 'lignes.produit', 'paiements']);
+            return $vente->fresh(['client', 'lignes.produit', 'paiements', 'attachments']);
         });
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Concerns\LinksAttachments;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBoucherieRequest;
 use App\Http\Requests\UpdateBoucherieRequest;
@@ -19,6 +20,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
  */
 class BoucherieController extends Controller
 {
+    use LinksAttachments;
+
     public function __construct(private readonly BoucherieService $service) {}
 
     /**
@@ -41,7 +44,14 @@ class BoucherieController extends Controller
      */
     public function store(StoreBoucherieRequest $request): JsonResponse
     {
-        $boucherie = $this->service->create($request->validated());
+        $data          = $request->validated();
+        $attachmentIds = $this->stripAttachmentIds($data);
+
+        $boucherie = $this->linkAttachments(
+            $this->service->create($data),
+            $attachmentIds,
+            $request->user(),
+        );
 
         return response()->json([
             'data'    => new BoucherieResource($boucherie),

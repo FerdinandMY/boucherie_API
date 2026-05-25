@@ -27,8 +27,13 @@ class BoucherieResource extends JsonResource
             'adresse'    => $this->adresse,
             'ville'      => $this->ville,
             'telephone'  => $this->telephone,
-            'actif'      => $this->actif,
-            'created_at' => $this->created_at?->toISOString(),
+            'actif'        => $this->actif,
+            'fournisseur'  => $this->when(
+                $this->relationLoaded('fournisseurAssigne') && $this->fournisseurAssigne->isNotEmpty(),
+                fn () => new FournisseurResource($this->fournisseurAssigne->first()),
+            ),
+            'attachments'  => AttachmentResource::collection($this->whenLoaded('attachments')),
+            'created_at'   => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
     }

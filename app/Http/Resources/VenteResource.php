@@ -40,6 +40,7 @@ class VenteResource extends JsonResource
             'lignes'         => LigneVenteResource::collection($this->whenLoaded('lignes')),
             'paiements'      => PaiementResource::collection($this->whenLoaded('paiements')),
             'livraison'      => $this->whenLoaded('livraison', fn () => new LivraisonResource($this->livraison)),
+            'attachments'    => AttachmentResource::collection($this->whenLoaded('attachments')),
             'created_at'     => $this->created_at?->toISOString(),
             'updated_at'     => $this->updated_at?->toISOString(),
         ];

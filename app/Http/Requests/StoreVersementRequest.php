@@ -19,6 +19,8 @@ class StoreVersementRequest extends FormRequest
             'date_versement'      => ['required', 'date'],
             'reference'           => ['nullable', 'string', 'max:100'],
             'notes'               => ['nullable', 'string', 'max:1000'],
+            'attachment_ids'      => ['sometimes', 'array', 'max:3'],
+            'attachment_ids.*'    => ['uuid', 'exists:attachments,id'],
         ];
     }
 }

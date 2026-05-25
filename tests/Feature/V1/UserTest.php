@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Boucherie;
+use App\Models\Fournisseur;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
 
@@ -133,6 +134,45 @@ describe('PUT /api/v1/users/{id}', function () {
             ->assertOk()
             ->assertJsonPath('data.name', 'Nouveau Nom')
             ->assertJsonPath('message', 'Utilisateur mis à jour avec succès.');
+    });
+});
+
+describe('PATCH /api/v1/users/{id} — boucherie_ids fournisseur', function () {
+    it('synchronise les boucheries desservies pour un fournisseur', function () {
+        $b1 = Boucherie::factory()->create();
+        $b2 = Boucherie::factory()->create();
+        $user = fournisseurUser();
+        Fournisseur::factory()->create(['user_id' => $user->id]);
+        Sanctum::actingAs(adminUser());
+
+        $this->patchJson("/api/v1/users/{$user->id}", [
+            'boucherie_ids' => [$b1->id, $b2->id],
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.boucherie_ids', [$b1->id, $b2->id]);
+
+        $fournisseur = $user->fresh()->fournisseur;
+        expect($fournisseur)->not->toBeNull();
+        expect($fournisseur->boucheries()->pluck('boucheries.id')->all())
+            ->toEqualCanonicalizing([$b1->id, $b2->id]);
+    });
+
+    it('refuse d\'attribuer une boucherie déjà liée à un autre fournisseur', function () {
+        $b1   = Boucherie::factory()->create();
+        $f1   = fournisseurUser();
+        $f2   = fournisseurUser();
+        Fournisseur::factory()->create(['user_id' => $f1->id]);
+        $ent2 = Fournisseur::factory()->create(['user_id' => $f2->id]);
+
+        $ent2->boucheries()->attach($b1->id);
+
+        Sanctum::actingAs(adminUser());
+
+        $this->patchJson("/api/v1/users/{$f1->id}", [
+            'boucherie_ids' => [$b1->id],
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['boucherie_ids']);
     });
 });
 

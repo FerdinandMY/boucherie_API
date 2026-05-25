@@ -81,6 +81,8 @@ class AuthController extends Controller
      */
     public function me(): UserResource
     {
-        return new UserResource(auth()->user()->load('roles', 'boucherie'));
+        return new UserResource(
+            app(AuthService::class)->loadUserRelations(auth()->user()),
+        );
     }
 }

@@ -31,6 +31,8 @@ class StoreAbattageRequest extends FormRequest
             'stocks.*.produit_id'    => ['required_with:stocks', 'uuid', 'exists:produits,id'],
             'stocks.*.quantite'      => ['required_with:stocks', 'numeric', 'min:0'],
             'stocks.*.seuil_alerte'  => ['nullable', 'numeric', 'min:0'],
+            'attachment_ids'         => ['sometimes', 'array', 'max:3'],
+            'attachment_ids.*'       => ['uuid', 'exists:attachments,id'],
         ];
     }
 }

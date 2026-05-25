@@ -31,6 +31,7 @@ class ReceptionResource extends JsonResource
             'quantite_recue'  => $this->quantite_recue,
             'date_reception'  => $this->date_reception?->toDateString(),
             'notes'           => $this->notes,
+            'attachments'     => AttachmentResource::collection($this->whenLoaded('attachments')),
             'created_at'      => $this->created_at?->toISOString(),
         ];
     }

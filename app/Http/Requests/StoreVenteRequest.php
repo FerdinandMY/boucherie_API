@@ -24,6 +24,8 @@ class StoreVenteRequest extends FormRequest
             'lignes.*.produit_id'    => ['required', 'uuid', 'exists:produits,id'],
             'lignes.*.quantite'      => ['required', 'numeric', 'min:0.01'],
             'lignes.*.prix_unitaire' => ['nullable', 'numeric', 'min:0'],
+            'attachment_ids'         => ['sometimes', 'array', 'max:3'],
+            'attachment_ids.*'       => ['uuid', 'exists:attachments,id'],
         ];
     }
 }

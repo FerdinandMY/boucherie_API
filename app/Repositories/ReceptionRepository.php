@@ -32,7 +32,7 @@ class ReceptionRepository
     public function findOrFail(string $id): Reception
     {
         return $this->model->query()
-            ->with(['distribution.produit', 'distribution.abattage', 'boucherie', 'user'])
+            ->with(['distribution.produit', 'distribution.abattage', 'boucherie', 'user', 'attachments'])
             ->findOrFail($id);
     }
 

@@ -19,7 +19,7 @@ class AuthService
 
         $token = $user->createToken('api-token')->plainTextToken;
 
-        return ['user' => $user->load('roles'), 'token' => $token];
+        return ['user' => $this->loadUserRelations($user), 'token' => $token];
     }
 
     public function login(array $data): array
@@ -33,11 +33,20 @@ class AuthService
         $user->tokens()->delete();
         $token = $user->createToken('api-token')->plainTextToken;
 
-        return ['user' => $user->load('roles'), 'token' => $token];
+        return ['user' => $this->loadUserRelations($user), 'token' => $token];
     }
 
     public function logout(User $user): void
     {
         $user->tokens()->delete();
+    }
+
+    public function loadUserRelations(User $user): User
+    {
+        return $user->load([
+            'roles',
+            'boucherie.fournisseurAssigne.user',
+            'fournisseur.boucheries',
+        ]);
     }
 }

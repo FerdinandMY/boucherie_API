@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Concerns\LinksAttachments;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVenteRequest;
 use App\Http\Requests\UpdateVenteStatutRequest;
@@ -21,6 +22,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
  */
 class VenteController extends Controller
 {
+    use LinksAttachments;
+
     public function __construct(private readonly VenteService $service) {}
 
     /**
@@ -54,10 +57,15 @@ class VenteController extends Controller
      */
     public function store(StoreVenteRequest $request): JsonResponse
     {
-        $data               = $request->validated();
+        $data                 = $request->validated();
+        $attachmentIds        = $this->stripAttachmentIds($data);
         $data['boucherie_id'] = $request->user()->boucherie_id;
 
-        $vente = $this->service->create($data, $request->user()->id);
+        $vente = $this->linkAttachments(
+            $this->service->create($data, $request->user()->id),
+            $attachmentIds,
+            $request->user(),
+        );
 
         return response()->json([
             'data'    => new VenteResource($vente),
