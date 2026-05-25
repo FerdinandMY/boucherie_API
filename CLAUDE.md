@@ -31,7 +31,7 @@ app/Http/Requests/             Validation (FormRequest). authorize() retourne tr
 app/Http/Resources/            JsonResource — formatage JSON des réponses
 app/Services/                  Logique métier, transactions DB
 app/Repositories/              Queries Eloquent
-app/Models/                    Eloquent + HasUuids sur tous les modèles
+app/Models/                    Eloquent + HasUuids sur la plupart des modèles (sauf User)
 app/Policies/                  Contrôle d'accès par ressource (authorize() dans les controllers)
 ```
 
@@ -45,19 +45,19 @@ Trois rôles : `admin`, `boucher`, `fournisseur`. Créés au seeding et dans `te
 
 ## Modèles importants
 
-| Modèle | Table | Notes |
-|---|---|---|
-| `User` | `users` | `boucherie_id` nullable (null pour fournisseur) |
-| `Fournisseur` | `fournisseurs` | Entité liée à un User via `user_id` |
-| `AchatFournisseur` | `achats_fournisseurs` | Achat + liste d'animaux |
-| `Animal` | `animaux` | Créé automatiquement à l'achat |
-| `Abattage` | `abattages` | Déclenche la mise à jour du stock |
-| `Stock` | `stocks` | Unique sur `(boucherie_id, produit_id)` |
-| `Distribution` | `distributions` | Fournisseur → Boucherie |
-| `Versement` | `versements` | Paiement Boucherie → Fournisseur |
-| `EnumValeur` | `enum_valeurs` | Référentiels (espèces, catégories, statuts…) |
+| Modèle | Table | PK | Notes |
+|---|---|---|---|
+| `User` | `users` | **integer** (auto-increment) | `boucherie_id` nullable (null pour fournisseur). **Pas de `HasUuids`.** |
+| `Fournisseur` | `fournisseurs` | UUID | Lié à un User via `user_id` (integer FK) |
+| `AchatFournisseur` | `achats_fournisseurs` | UUID | Achat + liste d'animaux |
+| `Animal` | `animaux` | UUID | Créé automatiquement à l'achat |
+| `Abattage` | `abattages` | UUID | Déclenche la mise à jour du stock |
+| `Stock` | `stocks` | UUID | Unique sur `(boucherie_id, produit_id)` |
+| `Distribution` | `distributions` | UUID | `fournisseur_user_id` = integer (FK → `users.id`) |
+| `Versement` | `versements` | UUID | `fournisseur_user_id` et `valide_par` = integers (FK → `users.id`) |
+| `EnumValeur` | `enum_valeurs` | UUID | Référentiels (espèces, catégories, statuts…) |
 
-Tous les modèles utilisent des UUIDs (`HasUuids`).
+**Important :** `User.id` est un **integer** auto-increment, pas un UUID. Toutes les FK vers `users.id` (`fournisseur_user_id`, `valide_par`, `user_id` dans fournisseurs…) sont de type `integer`. Ne pas les déclarer en `string` dans les signatures de méthodes PHP.
 
 ## Tests
 
@@ -87,6 +87,12 @@ fournisseurUser(?Fournisseur $f)  // Crée un User avec rôle fournisseur
 - **EnumValeur requis** : plusieurs FormRequests valident les champs contre `enum_valeurs` (ex: `categorie_produit`, `unite_produit`, `type_mouvement`, `statut_vente`, `type_vente`). Les créer dans le `beforeEach` du test si nécessaire.
 - **Scoping Pest** : les propriétés `$this->xxx` définies dans un `beforeEach` d'un `describe()` parent ne sont **pas accessibles** dans les `it()` d'un `describe()` enfant. Utiliser des `beforeEach` à plat (fichier level).
 - **SQLite + migrations** : les migrations avec `->change()` ne fonctionnent pas sur SQLite. Ajouter un bypass `if (DB::connection()->getDriverName() === 'sqlite') return;`.
+- **Pivot fournisseur_boucherie requis** : les endpoints `distributions` et `versements` vérifient que le fournisseur est bien rattaché à la boucherie via la table pivot. Dans les tests, après `fournisseurUser($fournisseur)`, toujours faire :
+  ```php
+  $fournisseur->boucheries()->attach($boucherie->id);
+  ```
+  Sans ça, `assertBoucherieServedByFournisseurUser` lève un 403 et `fournisseurUserIdForBoucherie` retourne `null` (→ 422).
+- **User.id est un integer, pas un UUID** : le modèle `User` n'a pas `HasUuids`. Toutes les FK vers `users.id` (ex : `fournisseur_user_id`, `valide_par`) sont de type `integer`. Les valider avec `'integer'` (pas `'string'`) dans les FormRequests, et déclarer `int $fournisseurUserId` (pas `string`) dans les services et repositories.
 
 ### Base de données de test
 
