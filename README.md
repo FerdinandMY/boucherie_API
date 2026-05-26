@@ -46,10 +46,10 @@ php artisan serve
 
 | Variable | Description | Défaut |
 |---|---|---|
-| `ALLOWED_ORIGINS` | Origines CORS autorisées, séparées par virgule | `http://localhost:3000,http://localhost:8000` |
+| `ALLOWED_ORIGINS` | Origines CORS autorisées, séparées par virgule | `https://localhost,capacitor://localhost,http://localhost:3000` |
 | `SANCTUM_TOKEN_EXPIRATION` | Durée de vie des tokens en minutes | `43200` (30 jours) |
 
-> **Note — application mobile :** CORS est un mécanisme de sécurité navigateur uniquement. Pour une API consommée exclusivement par une app mobile, `ALLOWED_ORIGINS` n'a pas d'impact sécurité. La protection repose sur l'authentification Sanctum, le rate limiting et la validation des entrées.
+> **Note — Capacitor et CORS :** L'app mobile utilise Capacitor, dont la WebView (Chromium/WKWebView) applique les règles CORS comme un navigateur. Il faut impérativement inclure `https://localhost` (Android) et `capacitor://localhost` (iOS) dans `ALLOWED_ORIGINS`. Ne pas mettre `*` — préférer les origines explicites.
 
 ---
 

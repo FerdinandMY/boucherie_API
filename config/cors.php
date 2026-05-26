@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:8000')),
+    'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'https://localhost,capacitor://localhost,http://localhost:3000,http://localhost:8000')),
 
     'allowed_origins_patterns' => [],
 

@@ -172,4 +172,17 @@ Toujours vérifier que `php vendor/bin/pest --no-coverage` passe avant de pousse
 
 ## CORS
 
-CORS est un mécanisme **navigateur uniquement**. Cette API étant consommée par une application mobile, CORS n'a pas d'impact sécurité. La configuration dans `config/cors.php` est maintenue pour d'éventuels outils de développement web, mais n'est pas une surface d'attaque pour une app mobile.
+**Capacitor applique CORS.** L'app mobile utilise Capacitor, qui tourne dans une WebView (Chromium sur Android, WKWebView sur iOS). La WebView applique les règles CORS exactement comme un navigateur.
+
+Les origines Capacitor à autoriser :
+- Android : `https://localhost`
+- iOS : `capacitor://localhost`
+
+En production (Render), la variable d'environnement `ALLOWED_ORIGINS` doit contenir ces deux valeurs :
+```
+ALLOWED_ORIGINS=https://localhost,capacitor://localhost
+```
+
+La valeur par défaut dans `config/cors.php` inclut déjà ces origines pour le dev local.
+
+**Ne pas mettre `*`** — cela autoriserait n'importe quel site web à appeler l'API avec les cookies/tokens de l'utilisateur.
