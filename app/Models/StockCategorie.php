@@ -12,6 +12,8 @@ class StockCategorie extends Model
 {
     use HasUuids;
 
+    protected $table = 'stocks_categories';
+
     protected $fillable = ['boucherie_id', 'categorie', 'poids_kg_disponible'];
 
     protected $casts = [

@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Versement;
 use App\Repositories\VersementRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class VersementService
@@ -59,31 +60,35 @@ class VersementService
 
     public function valider(string $id, int $fournisseurUserId): Versement
     {
-        $versement = $this->repository->findOrFail($id);
+        return DB::transaction(function () use ($id, $fournisseurUserId) {
+            $versement = $this->repository->findOrFail($id);
 
-        $this->assertFournisseurOwns($versement, $fournisseurUserId);
-        $this->assertStatut($versement, 'en_attente', 'valider');
+            $this->assertFournisseurOwns($versement, $fournisseurUserId);
+            $this->assertStatut($versement, 'en_attente', 'valider');
 
-        return $this->repository->update($id, [
-            'statut'    => 'valide',
-            'valide_par' => $fournisseurUserId,
-            'valide_le'  => now(),
-        ]);
+            return $this->repository->update($id, [
+                'statut'     => 'valide',
+                'valide_par' => $fournisseurUserId,
+                'valide_le'  => now(),
+            ]);
+        });
     }
 
     public function rejeter(string $id, int $fournisseurUserId, ?string $motif): Versement
     {
-        $versement = $this->repository->findOrFail($id);
+        return DB::transaction(function () use ($id, $fournisseurUserId, $motif) {
+            $versement = $this->repository->findOrFail($id);
 
-        $this->assertFournisseurOwns($versement, $fournisseurUserId);
-        $this->assertStatut($versement, 'en_attente', 'rejeter');
+            $this->assertFournisseurOwns($versement, $fournisseurUserId);
+            $this->assertStatut($versement, 'en_attente', 'rejeter');
 
-        return $this->repository->update($id, [
-            'statut'       => 'rejete',
-            'motif_rejet'  => $motif,
-            'valide_par'   => $fournisseurUserId,
-            'valide_le'    => now(),
-        ]);
+            return $this->repository->update($id, [
+                'statut'      => 'rejete',
+                'motif_rejet' => $motif,
+                'valide_par'  => $fournisseurUserId,
+                'valide_le'   => now(),
+            ]);
+        });
     }
 
     private function assertFournisseurOwns(Versement $versement, int $fournisseurUserId): void

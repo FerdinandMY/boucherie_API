@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -30,7 +31,7 @@ class User extends Authenticatable
         return $this->belongsTo(Boucherie::class, 'boucherie_id');
     }
 
-    public function fournisseur(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function fournisseur(): HasOne
     {
         return $this->hasOne(Fournisseur::class, 'user_id');
     }
@@ -38,5 +39,25 @@ class User extends Authenticatable
     public function ventes(): HasMany
     {
         return $this->hasMany(Vente::class, 'user_id');
+    }
+
+    public function abattages(): HasMany
+    {
+        return $this->hasMany(Abattage::class, 'user_id');
+    }
+
+    public function paiements(): HasMany
+    {
+        return $this->hasMany(Paiement::class, 'user_id');
+    }
+
+    public function receptions(): HasMany
+    {
+        return $this->hasMany(Reception::class, 'user_id');
+    }
+
+    public function mouvementsStock(): HasMany
+    {
+        return $this->hasMany(MouvementStock::class, 'user_id');
     }
 }

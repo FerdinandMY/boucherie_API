@@ -129,4 +129,7 @@ RUN chmod +x /start.sh
 
 EXPOSE 80
 
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost/api/health || exit 1
+
 CMD ["/start.sh"]

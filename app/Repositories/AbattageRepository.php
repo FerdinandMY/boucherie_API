@@ -15,7 +15,7 @@ class AbattageRepository
     {
         return $this->model->query()
             ->when($boucherieId, fn ($q) => $q->where('boucherie_id', $boucherieId))
-            ->with(['animal', 'user'])
+            ->with(['animal', 'user', 'boucherie'])
             ->select(['id', 'animal_id', 'user_id', 'boucherie_id', 'date_abattage',
                       'poids_carcasse_kg', 'rendement_pct', 'notes', 'created_at', 'updated_at'])
             ->latest()
@@ -26,7 +26,7 @@ class AbattageRepository
     {
         return $this->model->query()
             ->whereHas('animal.fournisseur', fn ($q) => $q->where('user_id', $userId))
-            ->with(['animal', 'user'])
+            ->with(['animal', 'user', 'boucherie'])
             ->select(['id', 'animal_id', 'user_id', 'boucherie_id', 'date_abattage',
                       'poids_carcasse_kg', 'rendement_pct', 'notes', 'created_at', 'updated_at'])
             ->latest()

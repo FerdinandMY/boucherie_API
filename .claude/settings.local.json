@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cd c:\\\\laragon\\\\www\\\\butcher-backend-app; Get-Content storage\\\\logs\\\\laravel.log | Select-String -Pattern \"local\\\\.ERROR\" -Context 0, 5 | Select-Object -Last 3 | ForEach-Object { $_.ToString\\(\\) })"
+    ]
+  }
+}

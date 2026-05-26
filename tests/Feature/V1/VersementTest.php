@@ -3,10 +3,16 @@
 declare(strict_types=1);
 
 use App\Models\Boucherie;
+use App\Models\EnumValeur;
 use App\Models\Fournisseur;
 use App\Models\User;
 use App\Models\Versement;
 use Laravel\Sanctum\Sanctum;
+
+beforeEach(function () {
+    EnumValeur::firstOrCreate(['type' => 'mode_paiement', 'valeur' => 'especes'],      ['libelle' => 'Espèces']);
+    EnumValeur::firstOrCreate(['type' => 'mode_paiement', 'valeur' => 'mobile_money'], ['libelle' => 'Mobile Money']);
+});
 
 describe('GET /api/v1/versements', function () {
     it('retourne les versements de la boucherie (boucher)', function () {

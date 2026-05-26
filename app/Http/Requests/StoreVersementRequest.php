@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreVersementRequest extends FormRequest
 {
@@ -15,7 +16,7 @@ class StoreVersementRequest extends FormRequest
         return [
             'fournisseur_user_id' => ['required', 'integer', 'exists:users,id'],
             'montant'             => ['required', 'numeric', 'min:1'],
-            'mode_paiement'       => ['required', 'string', 'max:50'],
+            'mode_paiement'       => ['required', Rule::exists('enum_valeurs', 'valeur')->where('type', 'mode_paiement')],
             'date_versement'      => ['required', 'date'],
             'reference'           => ['nullable', 'string', 'max:100'],
             'notes'               => ['nullable', 'string', 'max:1000'],

@@ -55,15 +55,16 @@ class RecetteJournaliereController extends Controller
         $user        = $request->user();
         $boucherieId = $user->boucherie_id;
 
-        // Résoudre le fournisseur lié à cette boucherie
-        $fournisseur = Fournisseur::whereHas('achats', fn ($q) =>
-            $q->whereHas('animal.abattage.distributions', fn ($q2) =>
-                $q2->where('boucherie_id', $boucherieId)
-            )
-        )->latest()->first();
+        $fournisseurId = $request->input('fournisseur_id');
 
-        // Si aucun fournisseur trouvé via distributions, on attend que le boucher passe fournisseur_id
-        $fournisseurId = $request->input('fournisseur_id') ?? $fournisseur?->id;
+        if (! $fournisseurId) {
+            // Résoudre le fournisseur lié à cette boucherie via les distributions passées
+            $fournisseurId = Fournisseur::whereHas('achatsFournisseurs', fn ($q) =>
+                $q->whereHas('animaux.abattage.distributions', fn ($q2) =>
+                    $q2->where('boucherie_id', $boucherieId)
+                )
+            )->latest()->value('id');
+        }
 
         if (! $fournisseurId) {
             abort(422, 'Impossible de déterminer le fournisseur. Passez fournisseur_id.');

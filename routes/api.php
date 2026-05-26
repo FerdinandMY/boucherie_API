@@ -24,6 +24,8 @@ use App\Http\Controllers\Api\V1\VenteController;
 use App\Http\Controllers\Api\V1\VersementController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/health', fn () => response()->json(['status' => 'ok']));
+
 Route::prefix('v1')->group(function () {
 
     // ── Auth ──────────────────────────────────────────────────────────────
